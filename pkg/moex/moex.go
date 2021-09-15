@@ -41,7 +41,7 @@ type Provider interface {
 	GetSecurityDescription(isin string) (*SecurityDescription, error)
 }
 
-// Option конфирурирует провайдера
+// Option конфигурирует провайдера
 type Option func(p *provider) error
 
 // WithURL задает корневой URL сервиса ISS

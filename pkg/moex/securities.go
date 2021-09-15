@@ -36,8 +36,8 @@ const (
 	// ExchangeBond - биржевые облигации
 	ExchangeBond SecurityType = "exchange_bond"
 
-	// CbBond - облигации ЦБ
-	CbBond SecurityType = "cb_bond"
+	// CBBond - облигации ЦБ
+	CBBond SecurityType = "cb_bond"
 
 	// MunicipalBond - мунициальные облигации
 	MunicipalBond SecurityType = "municipal_bond"

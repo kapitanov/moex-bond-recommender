@@ -22,72 +22,117 @@ func TestProvider_GetMarketData(t *testing.T) {
         }
     },
     {
+        "securities": [
+            {
+                "SECID": "RU000A103D60",
+                "BOARDID": "AUCT",
+                "SHORTNAME": "КОБР-47",
+                "PREVWAPRICE": null,
+                "YIELDATPREVWAPRICE": 0,
+                "COUPONVALUE": 16.27,
+                "NEXTCOUPON": "2021-10-13",
+                "ACCRUEDINT": 11.09,
+                "PREVPRICE": null,
+                "LOTSIZE": 1,
+                "FACEVALUE": 1000,
+                "BOARDNAME": "Размещение: Аукцион - безадрес.",
+                "STATUS": "A",
+                "MATDATE": "2021-10-13",
+                "DECIMALS": 4,
+                "COUPONPERIOD": 92,
+                "ISSUESIZE": 300000000,
+                "PREVLEGALCLOSEPRICE": null,
+                "PREVADMITTEDQUOTE": null,
+                "PREVDATE": "2021-09-13",
+                "SECNAME": "КОБР-47",
+                "REMARKS": null,
+                "MARKETCODE": "FOND",
+                "INSTRID": "BOBR",
+                "SECTORID": null,
+                "MINSTEP": 0.0001,
+                "FACEUNIT": "SUR",
+                "BUYBACKPRICE": 100,
+                "BUYBACKDATE": "2021-10-13",
+                "ISIN": "RU000A103D60",
+                "LATNAME": "KOBR-47",
+                "REGNUMBER": "4-47-22BR2-1",
+                "CURRENCYID": "SUR",
+                "ISSUESIZEPLACED": 189102266,
+                "LISTLEVEL": 3,
+                "SECTYPE": "5",
+                "COUPONPERCENT": 6.750,
+                "OFFERDATE": null,
+                "SETTLEDATE": "2021-09-15",
+                "LOTVALUE": 1000
+            }
+        ],
         "marketdata": [
             {
-                "SECID": "RU000A0JNYN1",
-                "BID": 99.34,
+                "SECID": "RU000A103D60",
+                "BID": null,
                 "BIDDEPTH": null,
-                "OFFER": 99.35,
+                "OFFER": null,
                 "OFFERDEPTH": null,
-                "SPREAD": 0.01,
-                "BIDDEPTHT": 11572,
-                "OFFERDEPTHT": 40084,
-                "OPEN": 99.9,
-                "LOW": 99.22,
-                "HIGH": 99.9,
+                "SPREAD": 0,
+                "BIDDEPTHT": null,
+                "OFFERDEPTHT": null,
+                "OPEN": null,
+                "LOW": null,
+                "HIGH": null,
                 "LAST": 99.34,
                 "LASTCHANGE": -0.01,
-                "LASTCHANGEPRCNT": -0.01,
-                "QTY": 1,
-                "VALUE": 993.40,
-                "YIELD": 7.03,
-                "VALUE_USD": 13.65,
-                "WAPRICE": 99.43,
-                "LASTCNGTOLASTWAPRICE": -0.05,
-                "WAPTOPREVWAPRICEPRCNT": 0.04,
-                "WAPTOPREVWAPRICE": 0.04,
-                "YIELDATWAPRICE": 6.9,
-                "YIELDTOPREVYIELD": -0.06,
+                "LASTCHANGEPRCNT": 0,
+                "QTY": 0,
+                "VALUE": 0.00,
+                "YIELD": 0,
+                "VALUE_USD": 0,
+                "WAPRICE": null,
+                "LASTCNGTOLASTWAPRICE": 0,
+                "WAPTOPREVWAPRICEPRCNT": 0,
+                "WAPTOPREVWAPRICE": 0,
+                "YIELDATWAPRICE": 0,
+                "YIELDTOPREVYIELD": 0,
                 "CLOSEYIELD": 0,
                 "CLOSEPRICE": null,
                 "MARKETPRICETODAY": null,
-                "MARKETPRICE": 99.39,
-                "LASTTOPREVPRICE": -0.06,
-                "NUMTRADES": 117,
-                "VOLTODAY": 1099,
-                "VALTODAY": 1092739,
-                "VALTODAY_USD": 15018,
-                "BOARDID": "TQCB",
-                "TRADINGSTATUS": "T",
-                "UPDATETIME": "17:02:00",
-                "DURATION": 266,
+                "MARKETPRICE": null,
+                "LASTTOPREVPRICE": 0,
+                "NUMTRADES": 0,
+                "VOLTODAY": 0,
+                "VALTODAY": 0,
+                "VALTODAY_USD": 0,
+                "BOARDID": "AUCT",
+                "TRADINGSTATUS": "N",
+                "UPDATETIME": "19:00:13",
+                "DURATION": 29,
                 "NUMBIDS": null,
                 "NUMOFFERS": null,
-                "CHANGE": -0.06,
-                "TIME": "16:57:05",
+                "CHANGE": null,
+                "TIME": "19:00:13",
                 "HIGHBID": null,
                 "LOWOFFER": null,
-                "PRICEMINUSPREVWAPRICE": -0.05,
+                "PRICEMINUSPREVWAPRICE": null,
                 "LASTBID": null,
                 "LASTOFFER": null,
-                "LCURRENTPRICE": 99.34,
+                "LCURRENTPRICE": null,
                 "LCLOSEPRICE": null,
                 "MARKETPRICE2": null,
                 "ADMITTEDQUOTE": null,
                 "OPENPERIODPRICE": null,
-                "SEQNUM": 863392,
-                "SYSTIME": "2021-09-13 17:17:05",
-                "VALTODAY_RUR": 1092739,
+                "SEQNUM": 1985569,
+                "SYSTIME": "2021-09-14 19:15:51",
+                "VALTODAY_RUR": 0,
                 "IRICPICLOSE": null,
                 "BEICLOSE": null,
                 "CBRCLOSE": null,
                 "YIELDTOOFFER": null,
                 "YIELDLASTCOUPON": null,
-                "TRADINGSESSION": "1"
+                "TRADINGSESSION": null
             }
         ]
     }
-]`
+]
+`
 
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		u, err := url.Parse(req.RequestURI)
@@ -118,14 +163,23 @@ func TestProvider_GetMarketData(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(list)
 	assert.Equal(1, len(list))
-	assert.Equal("RU000A0JNYN1", list[0].SecurityID)
+	assert.Equal("RU000A103D60", list[0].SecurityID)
+	assert.Equal("AUCT", list[0].BoardID)
+
+	// "securities"
+	assert.NotNil(list[0].AccruedInterest)
+	assert.Equal(float64(11.09), *list[0].AccruedInterest)
+	assert.NotNil(list[0].FaceValue)
+	assert.Equal(float64(1000), *list[0].FaceValue)
+	assert.NotNil(list[0].Currency)
+	assert.Equal("SUR", *list[0].Currency)
+
+	// "marketdata"
 	assert.NotNil(list[0].Last)
 	assert.Equal(float64(99.34), *list[0].Last)
 	assert.NotNil(list[0].LastChange)
 	assert.Equal(float64(-0.01), *list[0].LastChange)
 	assert.Nil(list[0].ClosePrice)
 	assert.Nil(list[0].LegalClosePrice)
-	assert.Equal("TQCB", list[0].BoardID)
-	assert.Equal(int64(863392), list[0].SeqNum)
-	assert.Equal("2021-09-13 17:17:05", list[0].SysTime.String())
+	assert.Equal("2021-09-14 19:15:51", list[0].Time.String())
 }

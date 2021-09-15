@@ -7,14 +7,36 @@ import (
 
 // MarketData описывает итоги торгов по облигации
 type MarketData struct {
+	SecurityID      string
+	BoardID         string
+	AccruedInterest *float64
+	FaceValue       *float64
+	Currency        *string
+	Last            *float64
+	LastChange      *float64
+	ClosePrice      *float64
+	LegalClosePrice *float64
+	Time            *DateTime
+}
+
+// rawSecurityData описывает параметры облигации, зависящие от даты
+type rawSecurityData struct {
 	SecurityID      string   `json:"SECID"`
+	BoardID         string   `json:"BOARDID"`
+	AccruedInterest *float64 `json:"ACCRUEDINT"`
+	FaceValue       float64  `json:"FACEVALUE"`
+	Currency        string   `json:"CURRENCYID"`
+}
+
+// rawMarketData описывает итоги торгов по облигации (сырые данные)
+type rawMarketData struct {
+	SecurityID      string   `json:"SECID"`
+	BoardID         string   `json:"BOARDID"`
 	Last            *float64 `json:"LAST"`
 	LastChange      *float64 `json:"LASTCHANGE"`
 	ClosePrice      *float64 `json:"CLOSEPRICE"`
 	LegalClosePrice *float64 `json:"LCLOSEPRICE"`
-	BoardID         string   `json:"BOARDID"`
-	SeqNum          int64    `json:"SEQNUM"`
-	SysTime         DateTime `json:"SYSTIME"`
+	Time            DateTime `json:"SYSTIME"`
 }
 
 // GetMarketData возвращает текущие рыночные данные
@@ -33,18 +55,76 @@ func (p *provider) GetMarketData() ([]*MarketData, error) {
 		return nil, err
 	}
 
-	items := make([]*MarketData, 0)
+	collection := newMarketDataCollection()
 	for _, respItem := range resp {
 		if respItem.MarketData != nil {
-			for _, item := range respItem.MarketData {
-				items = append(items, item)
+			for _, s := range respItem.Securities {
+				item := collection.GetOrAdd(s.SecurityID, s.BoardID)
+				item.AccruedInterest = s.AccruedInterest
+				item.FaceValue = &s.FaceValue
+				item.Currency = &s.Currency
+			}
+
+			for _, m := range respItem.MarketData {
+				item := collection.GetOrAdd(m.SecurityID, m.BoardID)
+
+				item.Last = m.Last
+				item.LastChange = m.LastChange
+				item.ClosePrice = m.ClosePrice
+				item.LegalClosePrice = m.LegalClosePrice
+				item.Time = &m.Time
 			}
 		}
 	}
 
-	return items, nil
+	array := collection.GetItems()
+	return array, nil
 }
 
 type marketDataResponse struct {
-	MarketData []*MarketData `json:"marketdata"`
+	Securities []*rawSecurityData `json:"securities"`
+	MarketData []*rawMarketData   `json:"marketdata"`
+}
+
+type marketDataCollection struct {
+	data map[string]map[string]*MarketData
+}
+
+func newMarketDataCollection() *marketDataCollection {
+	return &marketDataCollection{
+		data: make(map[string]map[string]*MarketData),
+	}
+}
+
+func (collection *marketDataCollection) GetOrAdd(securityID, boardID string) *MarketData {
+	inner, exists := collection.data[securityID]
+	if !exists {
+		inner = make(map[string]*MarketData)
+		collection.data[securityID] = inner
+	}
+
+	item, exists := inner[boardID]
+	if !exists {
+		item = &MarketData{
+			SecurityID: securityID,
+			BoardID:    boardID,
+		}
+
+		inner[boardID] = item
+	}
+
+	return item
+}
+
+func (collection *marketDataCollection) GetItems() []*MarketData {
+	array := make([]*MarketData, len(collection.data))
+	array = array[0:0]
+
+	for _, inner := range collection.data {
+		for _, item := range inner {
+			array = append(array, item)
+		}
+	}
+
+	return array
 }
