@@ -1,6 +1,7 @@
 package moex
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -12,17 +13,106 @@ type SecurityDescription struct {
 	Properties map[PropertyID]*Property
 }
 
+// IsForQualifiedInvestorsOnly возвращает значение параметра IsForQualifiedInvestorsOnlyProperty
+func (desc SecurityDescription) IsForQualifiedInvestorsOnly() (bool, error) {
+	prop, exists := desc.Properties[IsForQualifiedInvestorsOnlyProperty]
+	if !exists {
+		return false, nil
+	}
+
+	value, err := prop.AsBool()
+	return value, err
+}
+
+// InitialFaceValue возвращает значение параметра InitialFaceValueProperty
+func (desc SecurityDescription) InitialFaceValue() (*float64, error) {
+	prop, exists := desc.Properties[InitialFaceValueProperty]
+	if !exists {
+		return nil, nil
+	}
+
+	value, err := prop.AsFloat64()
+	return &value, err
+}
+
+// FaceUnit возвращает значение параметра FaceUnitProperty
+func (desc SecurityDescription) FaceUnit() (*string, error) {
+	prop, exists := desc.Properties[FaceUnitProperty]
+	if !exists {
+		return nil, nil
+	}
+
+	value, err := prop.AsString()
+	return &value, err
+}
+
+// IssueDate возвращает значение параметра IssueDateProperty
+func (desc SecurityDescription) IssueDate() (*Date, error) {
+	prop, exists := desc.Properties[IssueDateProperty]
+	if !exists {
+		return nil, nil
+	}
+
+	value, err := prop.AsDate()
+	return &value, err
+}
+
+// MaturityDate возвращает значение параметра MaturityDateProperty
+func (desc SecurityDescription) MaturityDate() (*Date, error) {
+	prop, exists := desc.Properties[MaturityDateProperty]
+	if !exists {
+		return nil, nil
+	}
+
+	value, err := prop.AsDate()
+	return &value, err
+}
+
+// ListingLevel возвращает значение параметра ListingLevelProperty
+func (desc SecurityDescription) ListingLevel() (*float64, error) {
+	prop, exists := desc.Properties[ListingLevelProperty]
+	if !exists {
+		return nil, nil
+	}
+
+	value, err := prop.AsFloat64()
+	return &value, err
+}
+
+// CouponFrequency возвращает значение параметра CouponFrequencyProperty
+func (desc SecurityDescription) CouponFrequency() (*float64, error) {
+	prop, exists := desc.Properties[CouponFrequencyProperty]
+	if !exists {
+		return nil, nil
+	}
+
+	value, err := prop.AsFloat64()
+	return &value, err
+}
+
+// IsHighRisk возвращает значение параметра IsHighRiskProperty
+func (desc SecurityDescription) IsHighRisk() (bool, error) {
+	prop, exists := desc.Properties[IsHighRiskProperty]
+	if !exists {
+		return false, nil
+	}
+
+	value, err := prop.AsBool()
+	return value, err
+}
+
 // PropertyID содержит тип параметра ценной бумаги
 type PropertyID string
 
 const (
-	IssueDateProperty                     PropertyID = "ISSUEDATE"
-	MaturityDateProperty                  PropertyID = "MATDATE"
-	InitialFaceValueProperty              PropertyID = "INITIALFACEVALUE"
-	FaceUnitProperty                      PropertyID = "FACEUNIT"
-	ListingLevelProperty                  PropertyID = "LISTLEVEL"
-	IsForQuailifiedInverstorsOnlyProperty PropertyID = "ISQUALIFIEDINVESTORS"
-	CouponFrequencyProperty               PropertyID = "COUPONFREQUENCY"
+	IssueDateProperty                   PropertyID = "ISSUEDATE"
+	MaturityDateProperty                PropertyID = "MATDATE"
+	InitialFaceValueProperty            PropertyID = "INITIALFACEVALUE"
+	FaceUnitProperty                    PropertyID = "FACEUNIT"
+	ListingLevelProperty                PropertyID = "LISTLEVEL"
+	IsForQualifiedInvestorsOnlyProperty PropertyID = "ISQUALIFIEDINVESTORS"
+	CouponFrequencyProperty             PropertyID = "COUPONFREQUENCY"
+	IsHighRiskProperty                  PropertyID = "HIGHRISK"
 )
 
 // PropertyType содержит тип значения параметра ценной бумаги
@@ -86,7 +176,7 @@ func (p Property) AsBool() (bool, error) {
 }
 
 // GetSecurityDescription возвращает описание ценной бумаги
-func (p *provider) GetSecurityDescription(isin string) (*SecurityDescription, error) {
+func (p *provider) GetSecurityDescription(ctx context.Context, isin string) (*SecurityDescription, error) {
 	values := make(url.Values)
 
 	values.Set("iss.only", "description")
@@ -96,7 +186,7 @@ func (p *provider) GetSecurityDescription(isin string) (*SecurityDescription, er
 	u := fmt.Sprintf("/iss/securities/%s.json?%s", url.PathEscape(isin), values.Encode())
 
 	var resp []descriptionResponse
-	err := p.getJSON(u, &resp)
+	err := p.getJSON(ctx, u, &resp)
 	if err != nil {
 		return nil, err
 	}

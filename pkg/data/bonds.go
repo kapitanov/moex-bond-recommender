@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 // BondType содержит тип облигации
@@ -50,16 +50,18 @@ type Bond struct {
 	ISIN               string       `gorm:"column:isin"`
 	IsTraded           bool         `gorm:"column:is_traded"`
 	QualifiedOnly      bool         `gorm:"column:qualified_only"`
+	IsHighRisk         bool         `gorm:"column:high_risk"`
 	Type               BondType     `gorm:"column:type"`
-	Group              string       `gorm:"column:group"`
 	PrimaryBoardID     string       `gorm:"column:primary_board_id"`
-	MarketPriceBoardID string       `gorm:"column:marketprice_board_id"`
+	MarketPriceBoardID string       `gorm:"column:market_price_board_id"`
 	InitialFaceValue   float64      `gorm:"column:initial_face_value"`
 	FaceUnit           string       `gorm:"column:face_unit"`
 	IssueDate          sql.NullTime `gorm:"column:issue_date"`
 	MaturityDate       sql.NullTime `gorm:"column:maturity_date"`
-	CreatedAt          time.Time    `gorm:"created"`
-	UpdatedAt          time.Time    `gorm:"updated"`
+	ListingLevel       int          `gorm:"column:listing_level"`
+	CouponFrequency    int          `gorm:"column:coupon_freq"`
+	CreatedAt          time.Time    `gorm:"column:created"`
+	UpdatedAt          time.Time    `gorm:"column:updated"`
 	Issuer             Issuer
 	Payments           []Payment `gorm:"foreignKey:BondID"`
 }
@@ -79,14 +81,16 @@ type CreateBondArgs struct {
 	ISIN               string
 	IsTraded           bool
 	QualifiedOnly      bool
+	IsHighRisk         bool
 	Type               BondType
-	Group              string
 	PrimaryBoardID     string
 	MarketPriceBoardID string
 	InitialFaceValue   float64
 	FaceUnit           string
 	IssueDate          sql.NullTime
 	MaturityDate       sql.NullTime
+	ListingLevel       int
+	CouponFrequency    int
 }
 
 // UpdateBondArgs содержит данные для создания облигации
@@ -239,14 +243,16 @@ func (repo *bondRepository) Create(args CreateBondArgs) (*Bond, error) {
 		ISIN:               args.ISIN,
 		IsTraded:           args.IsTraded,
 		QualifiedOnly:      args.QualifiedOnly,
+		IsHighRisk:         args.IsHighRisk,
 		Type:               args.Type,
-		Group:              args.Group,
 		PrimaryBoardID:     args.PrimaryBoardID,
 		MarketPriceBoardID: args.MarketPriceBoardID,
 		InitialFaceValue:   args.InitialFaceValue,
 		FaceUnit:           args.FaceUnit,
 		IssueDate:          args.IssueDate,
 		MaturityDate:       args.MaturityDate,
+		ListingLevel:       args.ListingLevel,
+		CouponFrequency:    args.CouponFrequency,
 		CreatedAt:          now,
 		UpdatedAt:          now,
 	}

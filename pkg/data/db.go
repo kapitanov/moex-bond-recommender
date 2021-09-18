@@ -1,12 +1,20 @@
 package data
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
+	"io"
+	"log"
 
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/stdlib"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
-	"github.com/kapitanov/bond-planner/pkg/data/migrations"
+	"github.com/kapitanov/moex-bond-recommender/pkg/data/migrations"
 )
 
 var (
@@ -25,11 +33,13 @@ type DB interface {
 
 // TX представляет транзакцию БД
 type TX struct {
-	Issuers   IssuerRepository
-	Bonds     BondRepository
-	Payments  PaymentRepository
-	db        *gorm.DB
-	committed bool
+	Issuers    IssuerRepository
+	Bonds      BondRepository
+	Payments   PaymentRepository
+	Offers     OfferRepository
+	MarketData MarketDataRepository
+	db         *gorm.DB
+	committed  bool
 }
 
 // Commit фиксирует транзакцию
@@ -54,6 +64,7 @@ func (tx *TX) Close() {
 func New(options ...Option) (DB, error) {
 	conf := &dbContextConfig{
 		DSN: DefaultDataSource,
+		Log: log.New(io.Discard, "", 0),
 	}
 
 	for _, f := range options {
@@ -63,25 +74,23 @@ func New(options ...Option) (DB, error) {
 		}
 	}
 
-	dialector := postgres.New(postgres.Config{
-		DSN: conf.DSN,
-	})
-	db, err := gorm.Open(dialector, &gorm.Config{})
+	db, err := conf.Connect()
 	if err != nil {
 		return nil, err
 	}
 
+	conf.Log.Printf("migrating db schema")
 	err = migrations.Up(db)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dbContext{db}, nil
+	return &dbContext{db, conf.Log}, nil
 }
 
 const (
 	// DefaultDataSource содержит строку соединения с БД по умолчанию
-	DefaultDataSource = "postgres://localhost:5432/bond_planner"
+	DefaultDataSource = "postgres://postgres:postgres@localhost:5432/bond_planner"
 )
 
 // Option конфигурирует контекст БД
@@ -95,27 +104,115 @@ func WithDataSource(dsn string) Option {
 	}
 }
 
+// WithLogger задает логгер
+func WithLogger(log *log.Logger) Option {
+	return func(s *dbContextConfig) error {
+		if log == nil {
+			return fmt.Errorf("logger option is nil")
+		}
+
+		s.Log = log
+		return nil
+	}
+}
+
 type dbContextConfig struct {
 	DSN string
+	Log *log.Logger
+}
+
+func (c *dbContextConfig) Connect() (*gorm.DB, error) {
+	c.Log.Printf("connecting to postgres at \"%s\"", c.DSN)
+	cfg, err := pgx.ParseConfig(c.DSN)
+	if err != nil {
+		return nil, err
+	}
+
+	conn := stdlib.OpenDB(*cfg)
+	r, err := conn.Query("SELECT 1")
+	if err != nil {
+		err = errors.Unwrap(err)
+		switch err.(type) {
+		case *pgconn.PgError:
+			pgError := err.(*pgconn.PgError)
+			if pgError.Code == "3D000" { // database <name> doesn't exists
+				err = c.CreateDB(*cfg)
+				if err != nil {
+					return nil, err
+				}
+
+				r, err = conn.Query("SELECT 1")
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
+			break
+
+		default:
+			return nil, err
+		}
+	}
+
+	err = r.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	dialector := postgres.New(postgres.Config{
+		Conn: conn,
+	})
+	gormConf := &gorm.Config{
+		Logger: logger.Discard,
+	}
+	db, err := gorm.Open(dialector, gormConf)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+// CreateDB создает БД, считая, что она не существует
+func (c *dbContextConfig) CreateDB(cfg pgx.ConnConfig) error {
+	dbName := cfg.Database
+	c.Log.Printf("database %s doesn't exist and will be created", dbName)
+
+	cfg.Database = "postgres" // Default database
+
+	conn := stdlib.OpenDB(cfg)
+	defer conn.Close()
+
+	sqlCommand := fmt.Sprintf("CREATE DATABASE \"%s\"", dbName)
+	_, err := conn.Exec(sqlCommand)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type dbContext struct {
-	db *gorm.DB
+	db  *gorm.DB
+	log *log.Logger
 }
 
 // BeginTX начинает новую транзакцию
 func (ctx *dbContext) BeginTX() (*TX, error) {
-	db := ctx.db.Begin()
+	db := ctx.db.Begin(&sql.TxOptions{Isolation: sql.LevelSnapshot})
 	if db.Error != nil {
 		return nil, db.Error
 	}
 
 	tx := &TX{
-		Issuers:   &issuerRepository{db},
-		Bonds:     &bondRepository{db},
-		Payments:  &paymentRepository{db},
-		db:        db,
-		committed: false,
+		Issuers:    &issuerRepository{db},
+		Bonds:      &bondRepository{db},
+		Payments:   &paymentRepository{db},
+		Offers:     &offerRepository{db},
+		MarketData: &marketDataRepository{db},
+		db:         db,
+		committed:  false,
 	}
 
 	return tx, nil

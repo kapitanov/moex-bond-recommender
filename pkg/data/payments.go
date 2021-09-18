@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-
-	"github.com/kapitanov/bond-planner/pkg/moex"
 )
 
 // PaymentType содерижт тип выплаты
@@ -16,39 +14,11 @@ type PaymentType string
 const (
 	MaturityPayment     PaymentType = "M"
 	CouponPayment       PaymentType = "C"
-	OfferPayment        PaymentType = "O"
 	AmortizationPayment PaymentType = "A"
 )
 
-// OfferType содержит тип оферты
-type OfferType string
-
-const (
-	// GenericOffer - оферта
-	GenericOffer OfferType = OfferType(moex.GenericOffer)
-
-	// CompletedGenericOffer - состоявшаяся оферта
-	CompletedGenericOffer OfferType = OfferType(moex.CompletedGenericOffer)
-
-	// CanceledGenericOffer - отмененнная оферта
-	CanceledGenericOffer OfferType = OfferType(moex.CanceledGenericOffer)
-
-	// DefaultGenericOffer - дефолт оферты
-	DefaultGenericOffer OfferType = OfferType(moex.DefaultGenericOffer)
-
-	// TechDefaultGenericOffer - технический дефолт оферты
-	TechDefaultGenericOffer OfferType = OfferType(moex.TechDefaultGenericOffer)
-
-	// MaturityOffer - оферта-погашение
-	MaturityOffer OfferType = OfferType(moex.MaturityOffer)
-
-	// CanceledMaturityOffer - отмененнная оферта-погашение
-	CanceledMaturityOffer OfferType = OfferType(moex.CanceledMaturityOffer)
-)
-
-// Payment содержит данные по выплатам (погашения, купоны, оферты, амортизации)
+// Payment содержит данные по выплатам (погашения, купоны,  амортизации)
 type Payment struct {
-	/* Общие поля */
 	ID               int          `gorm:"column:id; primaryKey"`
 	BondID           int          `gorm:"column:bond_id"`
 	Type             PaymentType  `gorm:"column:type"`
@@ -58,12 +28,8 @@ type Payment struct {
 	ValueRub         float64      `gorm:"column:value_rub"`
 	CouponRecordDate sql.NullTime `gorm:"column:coupon_record_date"`
 	CouponStartDate  sql.NullTime `gorm:"column:coupon_start_date"`
-	OfferPrice       *float64     `gorm:"column:offer_price"`
-	OfferValue       *float64     `gorm:"column:offer_value"`
-	OfferAgent       *string      `gorm:"column:offer_agent"`
-	OfferType        *OfferType   `gorm:"column:offer_type"`
-	CreatedAt        time.Time    `gorm:"created"`
-	UpdatedAt        time.Time    `gorm:"updated"`
+	CreatedAt        time.Time    `gorm:"column:created"`
+	UpdatedAt        time.Time    `gorm:"column:updated"`
 	Bond             Bond
 }
 
@@ -100,15 +66,6 @@ type CreateAmortizationPaymentArgs struct {
 	CreatePaymentArgs
 }
 
-// CreateOfferPaymentArgs содержит параметры для создания выплаты по оферте
-type CreateOfferPaymentArgs struct {
-	CreatePaymentArgs
-	Price *float64
-	Value *float64
-	Agent string
-	Type  OfferType
-}
-
 // CreateMaturityPaymentArgs содержит параметры для создания выплаты по погашению
 type CreateMaturityPaymentArgs struct {
 	CreatePaymentArgs
@@ -136,9 +93,9 @@ type PaymentRepository interface {
 	// Если указанная выплата уже существует, то возвращается ошибка ErrAlreadyExists
 	CreateMaturity(args CreateMaturityPaymentArgs) (*Payment, error)
 
-	// CreateOffer создает новую выплату по оферте
-	// Если указанная выплата уже существует, то возвращается ошибка ErrAlreadyExists
-	CreateOffer(args CreateOfferPaymentArgs) (*Payment, error)
+	// Last возвращает последнюю выгруженную выплату указанного типа
+	// Если выплат указанного типа не существует, то возвращается ошибка ErrNotFound
+	Last(t PaymentType) (*Payment, error)
 }
 
 type paymentRepository struct {
@@ -223,19 +180,6 @@ func (repo *paymentRepository) CreateMaturity(args CreateMaturityPaymentArgs) (*
 	return repo.Create(args.CreatePaymentArgs, MaturityPayment, fn)
 }
 
-// CreateOffer создает новую выплату по оферте
-// Если указанная выплата уже существует, то возвращается ошибка ErrAlreadyExists
-func (repo *paymentRepository) CreateOffer(args CreateOfferPaymentArgs) (*Payment, error) {
-	var fn = func(payment *Payment) error {
-		payment.OfferPrice = args.Price
-		payment.OfferAgent = &args.Agent
-		payment.OfferType = &args.Type
-		return nil
-	}
-
-	return repo.Create(args.CreatePaymentArgs, OfferPayment, fn)
-}
-
 // Create создает новую выплату
 // Если указанная выплата уже существует, то возвращается ошибка ErrAlreadyExists
 func (repo *paymentRepository) Create(args CreatePaymentArgs, t PaymentType, fn func(*Payment) error) (*Payment, error) {
@@ -271,4 +215,22 @@ func (repo *paymentRepository) Create(args CreatePaymentArgs, t PaymentType, fn 
 	}
 
 	return payment, nil
+}
+
+// Last возвращает последнюю выгруженную выплату указанного типа
+// Если выплат указанного типа не существует, то возвращается ошибка ErrNotFound
+func (repo *paymentRepository) Last(t PaymentType) (*Payment, error) {
+	var payment Payment
+	err := repo.db.Where("type = ?", t).
+		Order("date DESC").
+		First(&payment).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	return &payment, nil
 }

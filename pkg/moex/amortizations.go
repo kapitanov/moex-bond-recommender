@@ -1,6 +1,7 @@
 package moex
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -85,17 +86,18 @@ type AmortizationListIterator interface {
 }
 
 // ListAmortizations возвращает итератор на список амортизаций
-func (p *provider) ListAmortizations(query AmortizationListQuery) AmortizationListIterator {
+func (p *provider) ListAmortizations(ctx context.Context, query AmortizationListQuery) AmortizationListIterator {
 	if query.Limit <= 0 {
 		query.Limit = 100
 	}
 
-	return &amortizationListIterator{p, query}
+	return &amortizationListIterator{p, query, ctx}
 }
 
 type amortizationListIterator struct {
 	provider *provider
 	query    AmortizationListQuery
+	ctx      context.Context
 }
 
 // Next загружает следующую страницу данных
@@ -104,7 +106,7 @@ func (it *amortizationListIterator) Next() ([]*Amortization, error) {
 	u := it.getURL()
 
 	resp := make([]amortizationsResponse, 0)
-	err := it.provider.getJSON(u, &resp)
+	err := it.provider.getJSON(it.ctx, u, &resp)
 	if err != nil {
 		return nil, err
 	}

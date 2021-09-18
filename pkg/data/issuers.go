@@ -9,13 +9,13 @@ import (
 
 // Issuer содержит данные эмитента
 type Issuer struct {
-	ID        int       `gorm:"primaryKey; column:id"`
+	ID        int       `gorm:"column:id; primaryKey"`
 	MoexID    int       `gorm:"column:moex_id; unique"`
-	Name      string    `gorm:"name"`
-	INN       *string   `gorm:"inn"`
-	OKPO      *string   `gorm:"okpo"`
-	CreatedAt time.Time `gorm:"created"`
-	UpdatedAt time.Time `gorm:"updated"`
+	Name      string    `gorm:"column:name"`
+	INN       *string   `gorm:"column:inn"`
+	OKPO      *string   `gorm:"column:okpo"`
+	CreatedAt time.Time `gorm:"column:created"`
+	UpdatedAt time.Time `gorm:"column:updated"`
 	Bonds     []Bond    `gorm:"foreignKey:IssuerID"`
 }
 

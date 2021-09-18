@@ -1,6 +1,7 @@
 package moex
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
@@ -40,7 +41,7 @@ type rawMarketData struct {
 }
 
 // GetMarketData возвращает текущие рыночные данные
-func (p *provider) GetMarketData() ([]*MarketData, error) {
+func (p *provider) GetMarketData(ctx context.Context) ([]*MarketData, error) {
 	values := make(url.Values)
 
 	values.Set("iss.only", "marketdata")
@@ -50,7 +51,7 @@ func (p *provider) GetMarketData() ([]*MarketData, error) {
 	u := fmt.Sprintf("/iss/engines/stock/markets/bonds/securities.json?%s", values.Encode())
 
 	resp := make([]marketDataResponse, 0)
-	err := p.getJSON(u, &resp)
+	err := p.getJSON(ctx, u, &resp)
 	if err != nil {
 		return nil, err
 	}

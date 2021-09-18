@@ -44,13 +44,13 @@ func register(id string, migrate gormigrate.MigrateFunc, rollback gormigrate.Rol
 
 func registerSQL(id, migrateSQL, rollbackSQL string) {
 	migrate := func(db *gorm.DB) error {
-		db.Exec(migrateSQL)
-		return db.Error
+		err := db.Exec(migrateSQL).Error
+		return err
 	}
 
 	rollback := func(db *gorm.DB) error {
-		db.Exec(rollbackSQL)
-		return db.Error
+		err := db.Exec(rollbackSQL).Error
+		return err
 	}
 
 	register(id, migrate, rollback)

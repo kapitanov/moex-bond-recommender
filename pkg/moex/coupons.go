@@ -1,6 +1,7 @@
 package moex
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -75,17 +76,18 @@ type CouponListIterator interface {
 }
 
 // ListCoupons возвращает итератор на список купонов
-func (p *provider) ListCoupons(query CouponListQuery) CouponListIterator {
+func (p *provider) ListCoupons(ctx context.Context, query CouponListQuery) CouponListIterator {
 	if query.Limit <= 0 {
 		query.Limit = 100
 	}
 
-	return &couponListIterator{p, query}
+	return &couponListIterator{p, query, ctx}
 }
 
 type couponListIterator struct {
 	provider *provider
 	query    CouponListQuery
+	ctx      context.Context
 }
 
 // Next загружает следующую страницу данных
@@ -94,7 +96,7 @@ func (it *couponListIterator) Next() ([]*Coupon, error) {
 	u := it.getURL()
 
 	resp := make([]couponsResponse, 0)
-	err := it.provider.getJSON(u, &resp)
+	err := it.provider.getJSON(it.ctx, u, &resp)
 	if err != nil {
 		return nil, err
 	}

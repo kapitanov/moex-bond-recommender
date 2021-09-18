@@ -6,7 +6,7 @@ import (
 
 	assertion "github.com/stretchr/testify/assert"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 type testDateStruct struct {

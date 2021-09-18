@@ -1,23 +1,24 @@
 package moex
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 )
 
 // Security описывает ценную бумагу
 type Security struct {
-	ID                 int64         `json:"id"`
+	ID                 int           `json:"id"`
 	SecurityID         string        `json:"secid"`
 	ShortName          string        `json:"shortname"`
 	RegNumber          string        `json:"regnumber"`
 	Name               string        `json:"name"`
 	ISIN               string        `json:"isin"`
 	IsTraded           TradingStatus `json:"is_traded"`
-	IssuerId           int64         `json:"emitent_id"`
+	IssuerId           int           `json:"emitent_id"`
 	IssuerName         string        `json:"emitent_title"`
-	IssuerINN          string        `json:"emitent_inn"`
-	IssuerOKPO         string        `json:"emitent_okpo"`
+	IssuerINN          *string       `json:"emitent_inn"`
+	IssuerOKPO         *string       `json:"emitent_okpo"`
 	Type               SecurityType  `json:"type"`
 	PrimaryBoardID     string        `json:"primary_boardid"`
 	MarketPriceBoardID string        `json:"marketprice_boardid"`
@@ -140,17 +141,18 @@ type SecurityListIterator interface {
 }
 
 // ListSecurities возвращает итератор на список ценных бумаг
-func (p *provider) ListSecurities(query SecurityListQuery) SecurityListIterator {
+func (p *provider) ListSecurities(ctx context.Context, query SecurityListQuery) SecurityListIterator {
 	if query.Limit <= 0 {
 		query.Limit = 100
 	}
 
-	return &securityListIterator{p, query}
+	return &securityListIterator{p, query, ctx}
 }
 
 type securityListIterator struct {
 	provider *provider
 	query    SecurityListQuery
+	ctx      context.Context
 }
 
 // Next загружает следующую страницу данных
@@ -159,7 +161,7 @@ func (it *securityListIterator) Next() ([]*Security, error) {
 	u := it.getURL()
 
 	resp := make([]securitiesResponse, 0)
-	err := it.provider.getJSON(u, &resp)
+	err := it.provider.getJSON(it.ctx, u, &resp)
 	if err != nil {
 		return nil, err
 	}

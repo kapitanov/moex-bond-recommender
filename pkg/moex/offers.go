@@ -1,6 +1,7 @@
 package moex
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -18,8 +19,8 @@ type Offer struct {
 	FaceUnit       string       `json:"faceunit"`
 	Price          *float64     `json:"price"`
 	Value          *float64     `json:"value"`
-	Agent          string       `json:"agent"`
-	Type           OfferType    `json:"offertype"`
+	Agent          *string      `json:"agent"`
+	Type           *OfferType   `json:"offertype"`
 }
 
 // OfferType содержит тип оферты
@@ -101,17 +102,18 @@ type OfferListIterator interface {
 }
 
 // ListOffers возвращает итератор на список оферт
-func (p *provider) ListOffers(query OfferListQuery) OfferListIterator {
+func (p *provider) ListOffers(ctx context.Context, query OfferListQuery) OfferListIterator {
 	if query.Limit <= 0 {
 		query.Limit = 100
 	}
 
-	return &offersListIterator{p, query}
+	return &offersListIterator{p, query, ctx}
 }
 
 type offersListIterator struct {
 	provider *provider
 	query    OfferListQuery
+	ctx      context.Context
 }
 
 // Next загружает следующую страницу данных
@@ -120,7 +122,7 @@ func (it *offersListIterator) Next() ([]*Offer, error) {
 	u := it.getURL()
 
 	resp := make([]offersResponse, 0)
-	err := it.provider.getJSON(u, &resp)
+	err := it.provider.getJSON(it.ctx, u, &resp)
 	if err != nil {
 		return nil, err
 	}

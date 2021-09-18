@@ -1,6 +1,7 @@
 package moex_test
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -8,7 +9,7 @@ import (
 
 	assertion "github.com/stretchr/testify/assert"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 func TestProperty_AsString(t *testing.T) {
@@ -87,7 +88,7 @@ func TestProperty_AsBool(t *testing.T) {
 	var prop moex.Property
 	err := json.Unmarshal([]byte(str), &prop)
 	assert.Nil(err)
-	assert.Equal(moex.IsForQuailifiedInverstorsOnlyProperty, prop.Name)
+	assert.Equal(moex.IsForQualifiedInvestorsOnlyProperty, prop.Name)
 
 	value, err := prop.AsBool()
 	assert.Nil(err)
@@ -167,7 +168,7 @@ func TestProvider_GetSecurityDescription(t *testing.T) {
 		return
 	}
 
-	desc, err := provider.GetSecurityDescription("TESTISIN")
+	desc, err := provider.GetSecurityDescription(context.Background(), "TESTISIN")
 	assert.Nil(err)
 	assert.NotNil(desc)
 	assert.NotNil(desc.Properties)
@@ -183,6 +184,6 @@ func TestProvider_GetSecurityDescription(t *testing.T) {
 	_, exists = desc.Properties[moex.FaceUnitProperty]
 	assert.True(exists)
 
-	_, exists = desc.Properties[moex.IsForQuailifiedInverstorsOnlyProperty]
+	_, exists = desc.Properties[moex.IsForQualifiedInvestorsOnlyProperty]
 	assert.True(exists)
 }

@@ -1,6 +1,7 @@
 package moex_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -8,7 +9,7 @@ import (
 
 	assertion "github.com/stretchr/testify/assert"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 func TestProvider_GetMarketData(t *testing.T) {
@@ -159,7 +160,7 @@ func TestProvider_GetMarketData(t *testing.T) {
 		return
 	}
 
-	list, err := provider.GetMarketData()
+	list, err := provider.GetMarketData(context.Background())
 	assert.Nil(err)
 	assert.NotNil(list)
 	assert.Equal(1, len(list))

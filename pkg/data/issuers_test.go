@@ -8,7 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/kapitanov/bond-planner/pkg/data"
+	"github.com/kapitanov/moex-bond-recommender/pkg/data"
 )
 
 func TestIssuer_Scan(t *testing.T) {

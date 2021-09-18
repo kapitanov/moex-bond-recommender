@@ -1,6 +1,7 @@
 package moex_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -9,7 +10,7 @@ import (
 
 	assertion "github.com/stretchr/testify/assert"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 func TestProvider_ListOffers(t *testing.T) {
@@ -123,7 +124,7 @@ func TestProvider_ListOffers(t *testing.T) {
 		return
 	}
 
-	it := provider.ListOffers(moex.OfferListQuery{})
+	it := provider.ListOffers(context.Background(), moex.OfferListQuery{})
 
 	{
 		offers, err := it.Next()

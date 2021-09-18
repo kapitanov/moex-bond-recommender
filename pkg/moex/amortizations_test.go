@@ -1,6 +1,7 @@
 package moex_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -9,7 +10,7 @@ import (
 
 	assertion "github.com/stretchr/testify/assert"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 func TestProvider_ListAmortizations(t *testing.T) {
@@ -119,7 +120,7 @@ func TestProvider_ListAmortizations(t *testing.T) {
 	provider, err := moex.NewProvider(moex.WithURL(testServer.URL))
 	assert.Nil(err)
 
-	it := provider.ListAmortizations(moex.AmortizationListQuery{})
+	it := provider.ListAmortizations(context.Background(), moex.AmortizationListQuery{})
 
 	{
 		amortizations, err := it.Next()

@@ -1,6 +1,7 @@
 package moex_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -9,7 +10,7 @@ import (
 
 	assertion "github.com/stretchr/testify/assert"
 
-	"github.com/kapitanov/bond-planner/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
 )
 
 func TestProvider_ListSecurities(t *testing.T) {
@@ -131,7 +132,7 @@ func TestProvider_ListSecurities(t *testing.T) {
 		return
 	}
 
-	it := provider.ListSecurities(moex.SecurityListQuery{})
+	it := provider.ListSecurities(context.Background(), moex.SecurityListQuery{})
 
 	{
 		securities, err := it.Next()

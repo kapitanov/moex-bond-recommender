@@ -1,6 +1,7 @@
 package moex
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,22 +24,22 @@ var (
 // Provider является точкой входа в адаптер для ISS
 type Provider interface {
 	// ListSecurities возвращает итератор на список ценных бумаг
-	ListSecurities(query SecurityListQuery) SecurityListIterator
+	ListSecurities(ctx context.Context, query SecurityListQuery) SecurityListIterator
 
 	// ListCoupons возвращает итератор на список купонов
-	ListCoupons(query CouponListQuery) CouponListIterator
+	ListCoupons(ctx context.Context, query CouponListQuery) CouponListIterator
 
 	// ListAmortizations возвращает итератор на список амортизаций
-	ListAmortizations(query AmortizationListQuery) AmortizationListIterator
+	ListAmortizations(ctx context.Context, query AmortizationListQuery) AmortizationListIterator
 
 	// ListOffers возвращает итератор на список оферт
-	ListOffers(query OfferListQuery) OfferListIterator
+	ListOffers(ctx context.Context, query OfferListQuery) OfferListIterator
 
 	// GetMarketData возвращает текущие рыночные данные
-	GetMarketData() ([]*MarketData, error)
+	GetMarketData(ctx context.Context) ([]*MarketData, error)
 
 	// GetSecurityDescription возвращает описание ценной бумаги
-	GetSecurityDescription(isin string) (*SecurityDescription, error)
+	GetSecurityDescription(ctx context.Context, isin string) (*SecurityDescription, error)
 }
 
 // Option конфигурирует провайдера
@@ -124,9 +125,14 @@ type provider struct {
 	Verbose    bool
 }
 
-func (p *provider) getJSON(url string, v interface{}) error {
+func (p *provider) getJSON(ctx context.Context, url string, v interface{}) error {
 	url = fmt.Sprintf("%s%s", p.BaseURL, url)
-	resp, err := p.HTTPClient.Get(url)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		p.Logger.Printf("GET %s: %s", url, err)
+		return err
+	}
+	resp, err := p.HTTPClient.Do(req)
 	if err != nil {
 		p.Logger.Printf("GET %s: %s", url, err)
 		return err
@@ -203,6 +209,11 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 // NullableDate представляет дату в JSON формате, для которой допускается значение nil
 type NullableDate struct {
 	time *time.Time
+}
+
+// HasValue возвращает true, если значение - не nil
+func (d NullableDate) HasValue() bool {
+	return d.time != nil
 }
 
 // Time возвращает дату и время
