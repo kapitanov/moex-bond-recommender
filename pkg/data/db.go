@@ -38,6 +38,7 @@ type TX struct {
 	Payments   PaymentRepository
 	Offers     OfferRepository
 	MarketData MarketDataRepository
+	Search     SearchRepository
 	db         *gorm.DB
 	committed  bool
 }
@@ -211,6 +212,7 @@ func (ctx *dbContext) BeginTX() (*TX, error) {
 		Payments:   &paymentRepository{db},
 		Offers:     &offerRepository{db},
 		MarketData: &marketDataRepository{db},
+		Search:     &searchRepository{db},
 		db:         db,
 		committed:  false,
 	}

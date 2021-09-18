@@ -10,12 +10,14 @@ import (
 	"github.com/kapitanov/moex-bond-recommender/pkg/data"
 	"github.com/kapitanov/moex-bond-recommender/pkg/fetch"
 	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/search"
 )
 
 type App struct {
 	Moex            moex.Provider
 	DB              data.DB
 	Fetch           fetch.Service
+	Search          search.Service
 	fetchInProgress trylock.TryLocker
 }
 
@@ -32,8 +34,14 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
-	serviceLogger := log.New(log.Writer(), "fetch: ", log.Flags())
-	service, err := fetch.New(fetch.WithDB(db), fetch.WithProvider(provider), fetch.WithLogger(serviceLogger))
+	fetchLogger := log.New(log.Writer(), "fetch: ", log.Flags())
+	fetchService, err := fetch.New(fetch.WithProvider(provider), fetch.WithLogger(fetchLogger))
+	if err != nil {
+		return nil, err
+	}
+
+	searchLogger := log.New(log.Writer(), "search: ", log.Flags())
+	searchService, err := search.New(search.WithLogger(searchLogger))
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +49,8 @@ func NewApp() (*App, error) {
 	app := &App{
 		Moex:            provider,
 		DB:              db,
-		Fetch:           service,
+		Fetch:           fetchService,
+		Search:          searchService,
 		fetchInProgress: trylock.New(),
 	}
 	return app, nil
@@ -102,4 +111,14 @@ func (app *App) FetchMarketData(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func (app *App) ExecSearch(req search.Request) (*search.Result, error) {
+	tx, err := app.DB.BeginTX()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tx.Close()
+
+	return app.Search.Do(tx, req)
 }

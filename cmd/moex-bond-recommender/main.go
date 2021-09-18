@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -21,6 +22,7 @@ var rootCommand = &cobra.Command{
 var (
 	postgresConnString string
 	moexURL            string
+	quietMode          bool
 )
 
 var appLogger *log.Logger
@@ -28,12 +30,19 @@ var appLogger *log.Logger
 func init() {
 	rootCommand.PersistentFlags().StringVarP(&postgresConnString, "psql", "p", data.DefaultDataSource, "Postgres connnection string")
 	rootCommand.PersistentFlags().StringVar(&moexURL, "moex", moex.DefaultURL, "ISS root URL")
+	rootCommand.PersistentFlags().BoolVarP(&quietMode, "quiet", "q", false, "Suppress logging")
+
+	rootCommand.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		log.SetFlags(log.LstdFlags | log.Lmsgprefix)
+		if quietMode {
+			log.SetOutput(io.Discard)
+		}
+
+		appLogger = log.New(log.Writer(), "app:  ", log.Flags())
+	}
 }
 
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lmsgprefix)
-	appLogger = log.New(log.Writer(), "app:  ", log.Flags())
-
 	err := rootCommand.Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)

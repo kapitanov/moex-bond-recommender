@@ -5,8 +5,9 @@ import (
 )
 
 var fetchCommand = &cobra.Command{
-	Use:   "fetch",
-	Short: "Fetch commands",
+	Use:              "fetch",
+	Short:            "Fetch commands",
+	TraverseChildren: true,
 }
 
 func init() {

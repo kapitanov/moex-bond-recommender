@@ -60,14 +60,6 @@ func WithProvider(provider moex.Provider) Option {
 	}
 }
 
-// WithDB задает контекст БД
-func WithDB(db data.DB) Option {
-	return func(s *service) error {
-		s.db = db
-		return nil
-	}
-}
-
 // WithLogger задает логгер
 func WithLogger(log *log.Logger) Option {
 	return func(s *service) error {
@@ -92,9 +84,6 @@ func New(options ...Option) (Service, error) {
 		}
 	}
 
-	if service.db == nil {
-		return nil, fmt.Errorf("missing required option WithDB")
-	}
 	if service.provider == nil {
 		return nil, fmt.Errorf("missing required option WithProvider")
 	}
@@ -104,7 +93,6 @@ func New(options ...Option) (Service, error) {
 
 type service struct {
 	provider moex.Provider
-	db       data.DB
 	log      *log.Logger
 }
 

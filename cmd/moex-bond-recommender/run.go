@@ -5,8 +5,9 @@ import (
 )
 
 var runCommand = &cobra.Command{
-	Use:   "run",
-	Short: "Run commands",
+	Use:              "run",
+	Short:            "Run commands",
+	TraverseChildren: true,
 }
 
 func init() {
