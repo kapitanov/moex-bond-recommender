@@ -44,7 +44,7 @@ type rawMarketData struct {
 func (p *provider) GetMarketData(ctx context.Context) ([]*MarketData, error) {
 	values := make(url.Values)
 
-	values.Set("iss.only", "marketdata")
+	values.Set("iss.only", "securities,marketdata")
 	values.Set("iss.json", "extended")
 	values.Set("iss.meta", "off")
 

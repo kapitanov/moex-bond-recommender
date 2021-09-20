@@ -13,7 +13,7 @@ import (
 func init() {
 	cmd := &cobra.Command{
 		Use:   "search",
-		Short: "Search bonds",
+		Short: "searchService bonds",
 		Args:  cobra.ExactArgs(1),
 	}
 
@@ -37,7 +37,7 @@ func init() {
 			Skip:  skip,
 			Limit: limit,
 		}
-		result, err := app.ExecSearch(req)
+		result, err := app.Search(req)
 		if err != nil {
 			return err
 		}

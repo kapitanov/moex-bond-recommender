@@ -21,7 +21,7 @@ func init() {
 			return err
 		}
 
-		ctx := createCancellableContext()
+		ctx := CreateCancellableContext()
 
 		appLogger.Printf("fetching static data (initial fetch)")
 		err = app.FetchStaticData(ctx)

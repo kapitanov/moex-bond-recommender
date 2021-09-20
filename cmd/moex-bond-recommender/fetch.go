@@ -6,7 +6,7 @@ import (
 
 var fetchCommand = &cobra.Command{
 	Use:              "fetch",
-	Short:            "Fetch commands",
+	Short:            "fetchService commands",
 	TraverseChildren: true,
 }
 

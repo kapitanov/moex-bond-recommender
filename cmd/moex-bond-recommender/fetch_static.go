@@ -7,7 +7,7 @@ import (
 func init() {
 	cmd := &cobra.Command{
 		Use:   "static",
-		Short: "Fetch static data only",
+		Short: "fetchService static data only",
 	}
 
 	fetchCommand.AddCommand(cmd)
@@ -18,7 +18,7 @@ func init() {
 			return err
 		}
 
-		ctx := createCancellableContext()
+		ctx := CreateCancellableContext()
 
 		err = app.FetchStaticData(ctx)
 		if err != nil {

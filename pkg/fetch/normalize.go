@@ -8,10 +8,8 @@ import (
 )
 
 func normalizeCurrency(str string) string {
-	switch str {
-	case "SUR":
-	case "RUR":
-		return "RUB"
+	if str == "SUR" {
+		str = "RUB"
 	}
 
 	return str

@@ -33,14 +33,17 @@ type DB interface {
 
 // TX представляет транзакцию БД
 type TX struct {
-	Issuers    IssuerRepository
-	Bonds      BondRepository
-	Payments   PaymentRepository
-	Offers     OfferRepository
-	MarketData MarketDataRepository
-	Search     SearchRepository
-	db         *gorm.DB
-	committed  bool
+	Issuers                  IssuerRepository
+	Bonds                    BondRepository
+	Payments                 PaymentRepository
+	Offers                   OfferRepository
+	MarketData               MarketDataRepository
+	Search                   SearchRepository
+	CashFlow                 CashFlowRepository
+	Reports                  ReportRepository
+	CollectionBondReferences CollectionBondRefRepository
+	db                       *gorm.DB
+	committed                bool
 }
 
 // Commit фиксирует транзакцию
@@ -91,7 +94,7 @@ func New(options ...Option) (DB, error) {
 
 const (
 	// DefaultDataSource содержит строку соединения с БД по умолчанию
-	DefaultDataSource = "postgres://postgres:postgres@localhost:5432/bond_planner"
+	DefaultDataSource = "postgres://postgres:postgres@localhost:5432/bond_recommender"
 )
 
 // Option конфигурирует контекст БД
@@ -207,14 +210,17 @@ func (ctx *dbContext) BeginTX() (*TX, error) {
 	}
 
 	tx := &TX{
-		Issuers:    &issuerRepository{db},
-		Bonds:      &bondRepository{db},
-		Payments:   &paymentRepository{db},
-		Offers:     &offerRepository{db},
-		MarketData: &marketDataRepository{db},
-		Search:     &searchRepository{db},
-		db:         db,
-		committed:  false,
+		Issuers:                  &issuerRepository{db},
+		Bonds:                    &bondRepository{db},
+		Payments:                 &paymentRepository{db},
+		Offers:                   &offerRepository{db},
+		MarketData:               &marketDataRepository{db},
+		Search:                   &searchRepository{db},
+		CashFlow:                 &cashFlowRepository{db},
+		Reports:                  &reportRepository{db},
+		CollectionBondReferences: &collectionBondRefRepository{db},
+		db:                       db,
+		committed:                false,
 	}
 
 	return tx, nil

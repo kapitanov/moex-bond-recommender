@@ -7,7 +7,7 @@ import (
 func init() {
 	cmd := &cobra.Command{
 		Use:   "dynamic",
-		Short: "Fetch market data only",
+		Short: "fetchService market data only",
 	}
 
 	fetchCommand.AddCommand(cmd)
@@ -18,7 +18,7 @@ func init() {
 			return err
 		}
 
-		ctx := createCancellableContext()
+		ctx := CreateCancellableContext()
 
 		err = app.FetchMarketData(ctx)
 		if err != nil {
