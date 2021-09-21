@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -12,6 +13,7 @@ import (
 	"github.com/kapitanov/moex-bond-recommender/pkg/search"
 )
 
+// SearchPage обрабатывает запросы "GET /search"
 func (ctrl *pagesController) SearchPage(c *gin.Context) {
 	query, exists := c.GetQuery("q")
 	if !exists {
@@ -33,14 +35,22 @@ func (ctrl *pagesController) SearchPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "pages/search", model)
 }
 
+// SearchPageModel - модель для страницы "pages/search.html"
 type SearchPageModel struct {
 	Query      string
 	Bonds      []*data.Bond
 	TotalCount int
 }
 
+// NewSearchPageModel создает объекты типа SearchPageModel
 func NewSearchPageModel(app app.App, query string) (*SearchPageModel, error) {
-	response, err := app.Search(search.Request{Text: query})
+	u, err := app.NewUnitOfWork(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer u.Close()
+
+	response, err := u.Search(search.Request{Text: query})
 	if err != nil {
 		return nil, err
 	}

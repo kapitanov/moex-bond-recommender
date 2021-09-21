@@ -11,6 +11,7 @@ import (
 	"github.com/kapitanov/moex-bond-recommender/pkg/recommender"
 )
 
+// BondPage обрабатывает запросы "GET /bonds/:id"
 func (ctrl *pagesController) BondPage(c *gin.Context) {
 	id := c.Param("id")
 
@@ -28,14 +29,22 @@ func (ctrl *pagesController) BondPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "pages/bond", model)
 }
 
+// BondPageModel - модель для страницы "pages/bond.html"
 type BondPageModel struct {
 	Bond   *data.Bond
 	Issuer *data.Issuer
 	Report *recommender.Report
 }
 
+// NewBondPageModel создает новые объекты типа BondPageModel
 func NewBondPageModel(app app.App, id string) (*BondPageModel, error) {
-	report, err := app.GetReport(context.Background(), id)
+	u, err := app.NewUnitOfWork(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer u.Close()
+
+	report, err := u.GetReport(id)
 	if err != nil {
 		return nil, err
 	}

@@ -1,15 +1,63 @@
 package main
 
 import (
+	"log"
+
+	"github.com/madflojo/tasks"
 	"github.com/spf13/cobra"
+
+	"github.com/kapitanov/moex-bond-recommender/pkg/app"
+	"github.com/kapitanov/moex-bond-recommender/pkg/web"
 )
 
-var runCommand = &cobra.Command{
-	Use:              "run",
-	Short:            "Run commands",
-	TraverseChildren: true,
-}
-
 func init() {
-	rootCommand.AddCommand(runCommand)
+	cmd := &cobra.Command{
+		Use:   "run",
+		Short: "Run web app",
+	}
+
+	rootCommand.AddCommand(cmd)
+
+	var (
+		postgresConnString, moexURL, address string
+	)
+	attachPostgresUrlFlag(cmd, &postgresConnString)
+	attachMoexUrlFlag(cmd, &moexURL)
+	attachListenAddressFlag(cmd, &address)
+
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		ctx := CreateCancellableContext()
+
+		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
+		if err != nil {
+			return err
+		}
+		defer app.Close()
+
+		err = app.StartBackgroundTasks()
+		if err != nil {
+			return err
+		}
+
+		webappLogger := log.New(log.Writer(), "web:  ", log.Flags())
+		webapp, err := web.New(web.WithListenAddress(address), web.WithLogger(webappLogger), web.WithApp(app))
+		if err != nil {
+			return err
+		}
+
+		scheduler := tasks.New()
+		defer scheduler.Stop()
+
+		err = webapp.Start()
+		if err != nil {
+			return err
+		}
+		defer webapp.Close()
+
+		// Ожидание SIGINT
+		appLogger.Printf("web app is running, press <Ctrl+C> to exit")
+		<-ctx.Done()
+
+		return nil
+	}
 }

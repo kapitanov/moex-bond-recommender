@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"strconv"
 	"time"
 
+	"github.com/reugn/go-quartz/quartz"
 	"github.com/subchen/go-trylock"
 
 	"github.com/kapitanov/moex-bond-recommender/pkg/data"
@@ -21,6 +21,29 @@ type appImpl struct {
 	searchService      search.Service
 	recommenderService recommender.Service
 	fetchInProgress    trylock.TryLocker
+	scheduler          quartz.Scheduler
+	isSchedulerRunning bool
+}
+
+// IsStaticDataUpToDate возвращает false, если статические данные нуждаются в обновлении
+func (app *appImpl) IsStaticDataUpToDate(ctx context.Context) (bool, error) {
+	tx, err := app.db.BeginTX()
+	if err != nil {
+		return false, err
+	}
+	defer tx.Close()
+
+	lastTime, err := tx.Bonds.GetLastUpdateTime()
+	if err != nil {
+		return false, err
+	}
+
+	if lastTime == nil {
+		return false, nil
+	}
+
+	isUpToDate := time.Now().Sub(*lastTime).Hours() < 24.0
+	return isUpToDate, nil
 }
 
 // FetchStaticData выполняет выгрузку статических данных
@@ -97,72 +120,18 @@ func (app *appImpl) FetchMarketData(ctx context.Context) error {
 	return nil
 }
 
-// Search выполняет поиск облигации по тексту
-func (app *appImpl) Search(req search.Request) (*search.Result, error) {
+// NewUnitOfWork создает новый unit of work
+func (app *appImpl) NewUnitOfWork(ctx context.Context) (UnitOfWork, error) {
 	tx, err := app.db.BeginTX()
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Close()
 
-	return app.searchService.Do(tx, req)
-}
-
-// ListCollections возвращает список коллекций рекомендаций
-func (app *appImpl) ListCollections() []recommender.Collection {
-	return app.recommenderService.ListCollections()
-}
-
-// GetCollection возвращает коллекцию рекомендаций по ее ID
-func (app *appImpl) GetCollection(ctx context.Context, id string, duration recommender.Duration) (recommender.Collection, []*recommender.Report, error) {
-	tx, err := app.db.BeginTX()
-	if err != nil {
-		return nil, nil, err
+	u := &unitOfWork{
+		tx:                 tx,
+		ctx:                ctx,
+		searchService:      app.searchService,
+		recommenderService: app.recommenderService,
 	}
-	defer tx.Close()
-
-	collection, err := app.recommenderService.GetCollection(id)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	items, err := collection.ListBonds(ctx, tx, duration)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return collection, items, nil
-}
-
-// GetReport возвращает отчет по отдельной облигации
-func (app *appImpl) GetReport(ctx context.Context, idOrISIN string) (*recommender.Report, error) {
-	tx, err := app.db.BeginTX()
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Close()
-
-	id, err := strconv.Atoi(idOrISIN)
-	if err != nil {
-		bond, err := tx.Bonds.GetByISIN(idOrISIN)
-		if err != nil {
-			if err == data.ErrNotFound {
-				bond, err = tx.Bonds.GetBySecurityID(idOrISIN)
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				return nil, err
-			}
-		}
-
-		id = bond.ID
-	}
-
-	report, err := app.recommenderService.GetReport(ctx, tx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return report, nil
+	return u, nil
 }

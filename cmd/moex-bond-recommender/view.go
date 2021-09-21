@@ -8,6 +8,7 @@ import (
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 
+	"github.com/kapitanov/moex-bond-recommender/pkg/app"
 	"github.com/kapitanov/moex-bond-recommender/pkg/recommender"
 )
 
@@ -20,14 +21,28 @@ func init() {
 
 	rootCommand.AddCommand(cmd)
 
+	var (
+		postgresConnString, moexURL string
+	)
+	attachPostgresUrlFlag(cmd, &postgresConnString)
+	attachMoexUrlFlag(cmd, &moexURL)
+
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := NewApp()
+		ctx := CreateCancellableContext()
+
+		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
 		if err != nil {
 			return err
 		}
+		defer app.Close()
 
-		ctx := CreateCancellableContext()
-		report, err := app.GetReport(ctx, args[0])
+		u, err := app.NewUnitOfWork(ctx)
+		if err != nil {
+			return err
+		}
+		defer u.Close()
+
+		report, err := u.GetReport(args[0])
 		if err != nil {
 			return err
 		}

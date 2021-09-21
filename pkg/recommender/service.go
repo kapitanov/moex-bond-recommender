@@ -28,7 +28,7 @@ func (s *service) ListCollections() []Collection {
 }
 
 // GetCollection возвращает коллекцию рекомендаций по ее ID
-// Если коллекциа не найдена, то возвращается ошибка ErrNotFound
+// Если коллекция не найдена, то возвращается ошибка ErrNotFound
 func (s *service) GetCollection(id string) (Collection, error) {
 	coll, exists := collections[id]
 	if !exists {

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ServeStaticFiles отвечает за раздачу статики
 func (s *service) ServeStaticFiles(c *gin.Context) {
 	dir, file := path.Split(c.Request.RequestURI)
 	ext := filepath.Ext(file)

@@ -15,13 +15,19 @@ import (
 	"github.com/kapitanov/moex-bond-recommender/pkg/app"
 )
 
+// DefaultAddress - адрес для прослушивания по умолчанию
 const DefaultAddress = "0.0.0.0:5000"
 
+// Service - сервис веб приложения
 type Service interface {
-	Start(ctx context.Context) error
+	// Start запускает веб приложение
+	Start() error
+
+	// Close завершает работу веб приложения
 	Close()
 }
 
+// New создает новые объекты типа Service
 func New(options ...Option) (Service, error) {
 	gin.SetMode(gin.ReleaseMode)
 
@@ -53,8 +59,10 @@ func New(options ...Option) (Service, error) {
 	return s, nil
 }
 
+// Option настраивает веб приложение
 type Option func(s *service) error
 
+// WithLogger задает логгер
 func WithLogger(logger *log.Logger) Option {
 	return func(s *service) error {
 		s.logger = logger
@@ -62,6 +70,7 @@ func WithLogger(logger *log.Logger) Option {
 	}
 }
 
+// WithLogger задает адрес для прослушивания
 func WithListenAddress(address string) Option {
 	return func(s *service) error {
 		s.address = address
@@ -69,6 +78,7 @@ func WithListenAddress(address string) Option {
 	}
 }
 
+// WithLogger задает экземпляр приложения app.App
 func WithApp(app app.App) Option {
 	return func(s *service) error {
 		s.app = app
@@ -83,42 +93,38 @@ type service struct {
 	done            *sync.WaitGroup
 	app             app.App
 	pagesController *pagesController
+	server          *http.Server
 }
 
-func (s *service) Start(ctx context.Context) error {
-	http.Handle("/", s.router)
-
-	server := &http.Server{Addr: s.address}
+// Start запускает веб приложение
+func (s *service) Start() error {
+	s.server = &http.Server{Addr: s.address}
+	s.server.Handler = s.router
 
 	go func() {
-		s.logger.Printf("listening on \"%s\"\n", server.Addr)
+		s.logger.Printf("listening on \"%s\"\n", s.server.Addr)
 
-		err := server.ListenAndServe()
+		err := s.server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			s.logger.Fatalf("could not listen on \"%s\": %v\n", server.Addr, err)
+			s.logger.Fatalf("could not listen on \"%s\": %v\n", s.server.Addr, err)
 		}
 
 		s.done.Done()
 	}()
 
-	go func() {
-		<-ctx.Done()
-
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		server.SetKeepAlivesEnabled(false)
-		err := server.Shutdown(ctx)
-		if err != nil {
-			s.logger.Fatalf("could not gracefully shutdown the server: %v\n", err)
-		}
-	}()
-
 	return nil
 }
 
+// Close завершает работу веб приложения
 func (s *service) Close() {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	s.server.SetKeepAlivesEnabled(false)
+	err := s.server.Shutdown(ctx)
+	if err != nil {
+		s.logger.Fatalf("could not gracefully shutdown the server: %v\n", err)
+	}
 }
 
 type pagesController struct {

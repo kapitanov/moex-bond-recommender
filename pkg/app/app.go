@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/reugn/go-quartz/quartz"
 	"github.com/subchen/go-trylock"
 
 	"github.com/kapitanov/moex-bond-recommender/pkg/data"
@@ -21,17 +22,14 @@ type App interface {
 	// FetchMarketData выполняет выгрузку рыночных данных
 	FetchMarketData(ctx context.Context) error
 
-	// Search выполняет поиск облигации по тексту
-	Search(req search.Request) (*search.Result, error)
+	// NewUnitOfWork создает новый unit of work
+	NewUnitOfWork(ctx context.Context) (UnitOfWork, error)
 
-	// ListCollections возвращает список коллекций рекомендаций
-	ListCollections() []recommender.Collection
+	// StartBackgroundTasks запускает фоновые задачи
+	StartBackgroundTasks() error
 
-	// GetCollection возвращает коллекцию рекомендаций по ее ID
-	GetCollection(ctx context.Context, id string, duration recommender.Duration) (recommender.Collection, []*recommender.Report, error)
-
-	// GetReport возвращает отчет по отдельной облигации
-	GetReport(ctx context.Context, idOrISIN string) (*recommender.Report, error)
+	// Close завершает работу приложения
+	Close()
 }
 
 type config struct {
@@ -109,6 +107,25 @@ func New(options ...Option) (App, error) {
 		searchService:      searchService,
 		recommenderService: recommenderService,
 		fetchInProgress:    trylock.New(),
+		scheduler:          quartz.NewStdScheduler(),
 	}
+
+	isUpToDate, err := app.IsStaticDataUpToDate(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	if !isUpToDate {
+		err = app.FetchStaticData(context.Background())
+		if err != nil {
+			return nil, err
+		}
+
+		err = app.FetchMarketData(context.Background())
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return app, nil
 }

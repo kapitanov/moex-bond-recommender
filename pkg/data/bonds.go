@@ -128,6 +128,9 @@ type BondRepository interface {
 	// Update обновляет данные эмитента
 	// Если эмитент не найден, возвращается ошибка ErrNotFound
 	Update(id int, args UpdateBondArgs) (*Bond, error)
+
+	// GetLastUpdateTime возвращает дату и время последней выгрузки данных
+	GetLastUpdateTime() (*time.Time, error)
 }
 
 type bondRepository struct {
@@ -309,4 +312,14 @@ func (repo *bondRepository) Update(id int, args UpdateBondArgs) (*Bond, error) {
 	}
 
 	return bond, nil
+}
+
+// GetLastUpdateTime возвращает дату и время последней выгрузки данных
+func (repo *bondRepository) GetLastUpdateTime() (*time.Time, error) {
+	var time *time.Time
+	err := repo.db.Raw("SELECT MAX(updated) FROM bonds").First(&time).Error
+	if err != nil {
+		return nil, err
+	}
+	return time, nil
 }

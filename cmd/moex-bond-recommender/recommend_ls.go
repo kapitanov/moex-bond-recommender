@@ -6,23 +6,39 @@ import (
 
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
+
+	"github.com/kapitanov/moex-bond-recommender/pkg/app"
 )
 
 func init() {
 	cmd := &cobra.Command{
 		Use:   "ls",
-		Short: "List collections",
+		Short: "List bond collections",
 	}
-
 	recommendCommand.AddCommand(cmd)
 
+	var (
+		postgresConnString, moexURL string
+	)
+	attachPostgresUrlFlag(cmd, &postgresConnString)
+	attachMoexUrlFlag(cmd, &moexURL)
+
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := NewApp()
+		ctx := CreateCancellableContext()
+
+		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
 		if err != nil {
 			return err
 		}
+		defer app.Close()
 
-		collections := app.ListCollections()
+		u, err := app.NewUnitOfWork(ctx)
+		if err != nil {
+			return err
+		}
+		defer u.Close()
+
+		collections := u.ListCollections()
 
 		table := uitable.New()
 		table.MaxColWidth = 80

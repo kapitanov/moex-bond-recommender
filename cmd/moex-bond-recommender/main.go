@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -9,9 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kapitanov/moex-bond-recommender/pkg/app"
 	"github.com/kapitanov/moex-bond-recommender/pkg/data"
 	"github.com/kapitanov/moex-bond-recommender/pkg/moex"
+	"github.com/kapitanov/moex-bond-recommender/pkg/web"
 )
 
 var rootCommand = &cobra.Command{
@@ -21,16 +22,12 @@ var rootCommand = &cobra.Command{
 }
 
 var (
-	postgresConnString string
-	moexURL            string
-	quietMode          bool
+	quietMode bool
 )
 
 var appLogger *log.Logger
 
 func init() {
-	rootCommand.PersistentFlags().StringVarP(&postgresConnString, "psql", "p", data.DefaultDataSource, "Postgres connnection string")
-	rootCommand.PersistentFlags().StringVar(&moexURL, "moex", moex.DefaultURL, "ISS root URL")
 	rootCommand.PersistentFlags().BoolVarP(&quietMode, "quiet", "q", false, "Suppress logging")
 
 	rootCommand.PersistentPreRun = func(cmd *cobra.Command, args []string) {
@@ -66,7 +63,35 @@ func CreateCancellableContext() context.Context {
 	return ctx
 }
 
-// NewApp создает новый объект приложения
-func NewApp() (app.App, error) {
-	return app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
+func attachPostgresUrlFlag(cmd *cobra.Command, value *string) {
+	envVarName := "POSTGRES_URL"
+	defaultValue := os.Getenv(envVarName)
+	if defaultValue == "" {
+		defaultValue = data.DefaultDataSource
+	}
+
+	usage := fmt.Sprintf("Postgres connection string (defaults to $%s)", envVarName)
+	cmd.Flags().StringVarP(value, "psql", "p", defaultValue, usage)
+}
+
+func attachMoexUrlFlag(cmd *cobra.Command, value *string) {
+	envVarName := "ISS_URL"
+	defaultValue := os.Getenv(envVarName)
+	if defaultValue == "" {
+		defaultValue = moex.DefaultURL
+	}
+
+	usage := fmt.Sprintf("ISS root URL (defaults to $%s)", envVarName)
+	cmd.Flags().StringVar(value, "moex", defaultValue, usage)
+}
+
+func attachListenAddressFlag(cmd *cobra.Command, value *string) {
+	envVarName := "LISTEN_ADDRR"
+	defaultValue := os.Getenv(envVarName)
+	if defaultValue == "" {
+		defaultValue = web.DefaultAddress
+	}
+
+	usage := fmt.Sprintf("Web app listen address (defaults to $%s)", envVarName)
+	cmd.Flags().StringVarP(value, "address", "a", defaultValue, usage)
 }

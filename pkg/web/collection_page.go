@@ -11,6 +11,7 @@ import (
 	"github.com/kapitanov/moex-bond-recommender/pkg/recommender"
 )
 
+// CollectionPage обрабатывает запросы "GET /collections/:id"
 func (ctrl *pagesController) CollectionPage(c *gin.Context) {
 	id := c.Param("id")
 	model, err := NewCollectionPageModel(ctrl.app, id)
@@ -27,19 +28,30 @@ func (ctrl *pagesController) CollectionPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "pages/collection", model)
 }
 
+// CollectionPageModel - модель для страницы "pages/collection.html"
 type CollectionPageModel struct {
 	ID               string
 	Name             string
 	ItemsPerDuration map[recommender.Duration][]CollectionPageItemModel
 }
 
+// NewCollectionPageModel создает новые объекты типа CollectionPageModel
 func NewCollectionPageModel(app app.App, id string) (*CollectionPageModel, error) {
-	// TODO нужен рефакторинг - не хватает unit of work
+	u, err := app.NewUnitOfWork(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer u.Close()
 
 	model := CollectionPageModel{}
 	model.ItemsPerDuration = make(map[recommender.Duration][]CollectionPageItemModel)
 	for _, duration := range recommender.Durations {
-		collection, reports, err := app.GetCollection(context.Background(), id, duration)
+		collection, err := u.GetCollection(id)
+		if err != nil {
+			return nil, err
+		}
+
+		reports, err := u.ListCollectionBonds(collection.ID(), duration)
 		if err != nil {
 			return nil, err
 		}
@@ -61,6 +73,7 @@ func NewCollectionPageModel(app app.App, id string) (*CollectionPageModel, error
 	return &model, nil
 }
 
+// CollectionPageItemModel - модель отдельной записи в коллекции (для страницы "pages/collection.html")
 type CollectionPageItemModel struct {
 	Bond   *data.Bond
 	Issuer *data.Issuer

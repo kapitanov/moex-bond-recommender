@@ -11,6 +11,7 @@ require (
 	github.com/jackc/pgconn v1.10.0
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/madflojo/tasks v1.0.0
+	github.com/reugn/go-quartz v0.3.4
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
 	github.com/subchen/go-trylock v1.3.0

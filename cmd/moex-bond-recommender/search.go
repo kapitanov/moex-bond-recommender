@@ -7,37 +7,49 @@ import (
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 
+	"github.com/kapitanov/moex-bond-recommender/pkg/app"
 	"github.com/kapitanov/moex-bond-recommender/pkg/search"
 )
 
 func init() {
 	cmd := &cobra.Command{
 		Use:   "search",
-		Short: "searchService bonds",
+		Short: "Search for bonds",
 		Args:  cobra.ExactArgs(1),
 	}
 
 	var (
-		skip, limit int
+		skip, limit                 int
+		postgresConnString, moexURL string
 	)
-
 	cmd.Flags().IntVar(&skip, "skip", 0, "How many items to skip")
 	cmd.Flags().IntVar(&limit, "limit", 10, "How many items to show")
+	attachPostgresUrlFlag(cmd, &postgresConnString)
+	attachMoexUrlFlag(cmd, &moexURL)
 
 	rootCommand.AddCommand(cmd)
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		app, err := NewApp()
+		ctx := CreateCancellableContext()
+
+		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
 		if err != nil {
 			return err
 		}
+		defer app.Close()
+
+		u, err := app.NewUnitOfWork(ctx)
+		if err != nil {
+			return err
+		}
+		defer u.Close()
 
 		req := search.Request{
 			Text:  args[0],
 			Skip:  skip,
 			Limit: limit,
 		}
-		result, err := app.Search(req)
+		result, err := u.Search(req)
 		if err != nil {
 			return err
 		}

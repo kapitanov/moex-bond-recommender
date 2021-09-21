@@ -17,7 +17,7 @@ type Service interface {
 	ListCollections() []Collection
 
 	// GetCollection возвращает коллекцию рекомендаций по ее ID
-	// Если коллекциа не найдена, то возвращается ошибка ErrNotFound
+	// Если коллекция не найдена, то возвращается ошибка ErrNotFound
 	GetCollection(id string) (Collection, error)
 
 	// GetReport возвращает отчет по отдельной облигации
@@ -60,7 +60,7 @@ type Collection interface {
 	Name() string
 
 	// ListBonds возвращает список облигаций из коллекции
-	ListBonds(ctx context.Context, tx *data.TX, duration Duration) ([]*Report, error)
+	ListBonds(ctx context.Context, tx *data.TX, limit int, duration Duration) ([]*Report, error)
 }
 
 // Report содержит данные отчета по облигации

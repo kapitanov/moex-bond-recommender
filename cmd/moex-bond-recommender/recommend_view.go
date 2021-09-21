@@ -8,17 +8,24 @@ import (
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 
+	"github.com/kapitanov/moex-bond-recommender/pkg/app"
 	"github.com/kapitanov/moex-bond-recommender/pkg/recommender"
 )
 
 func init() {
 	cmd := &cobra.Command{
 		Use:   "view",
-		Short: "View collection",
+		Short: "View bond collection",
 		Args:  cobra.ExactArgs(1),
 	}
 
 	recommendCommand.AddCommand(cmd)
+
+	var (
+		postgresConnString, moexURL string
+	)
+	attachPostgresUrlFlag(cmd, &postgresConnString)
+	attachMoexUrlFlag(cmd, &moexURL)
 
 	var durationStr string
 	cmd.Flags().StringVarP(
@@ -50,13 +57,26 @@ func init() {
 			return fmt.Errorf("\"%s\" is not a valid duration range, valid values are: 1y, 2y, 3y, 4y, 5y", durationStr)
 		}
 
-		app, err := NewApp()
+		ctx := CreateCancellableContext()
+
+		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
+		if err != nil {
+			return err
+		}
+		defer app.Close()
+
+		u, err := app.NewUnitOfWork(ctx)
+		if err != nil {
+			return err
+		}
+		defer u.Close()
+
+		collection, err := u.GetCollection(args[0])
 		if err != nil {
 			return err
 		}
 
-		ctx := CreateCancellableContext()
-		collection, reports, err := app.GetCollection(ctx, args[0], duration)
+		reports, err := u.ListCollectionBonds(collection.ID(), duration)
 		if err != nil {
 			return err
 		}

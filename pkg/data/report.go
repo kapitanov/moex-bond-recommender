@@ -40,7 +40,7 @@ type ReportRepository interface {
 	Get(id int) (*Report, error)
 
 	// List возвращает отчеты по облигациям, которые удовлетворяют указанному подзапросу
-	List(filter string, values ...interface{}) ([]*Report, error)
+	List(limit int, filter string, values ...interface{}) ([]*Report, error)
 
 	// Rebuild выполняет перерасчет отчетов по облигациям
 	Rebuild() error
@@ -69,7 +69,7 @@ LIMIT 1
 }
 
 // List возвращает отчеты по облигациям, которые удовлетворяют указанному подзапросу
-func (repo *reportRepository) List(filter string, values ...interface{}) ([]*Report, error) {
+func (repo *reportRepository) List(limit int, filter string, values ...interface{}) ([]*Report, error) {
 	sqlQuery := `
 WITH cte AS (
 %s
@@ -78,10 +78,10 @@ SELECT reports.*
 FROM reports
 INNER JOIN cte ON cte.bond_id = reports.bond_id
 ORDER BY cte.index ASC
-LIMIT 10;
+LIMIT %d;
 `
 
-	sqlQuery = fmt.Sprintf(sqlQuery, filter)
+	sqlQuery = fmt.Sprintf(sqlQuery, filter, limit)
 
 	var reports []*Report
 	err := repo.db.Raw(sqlQuery, values...).Scan(&reports).Error

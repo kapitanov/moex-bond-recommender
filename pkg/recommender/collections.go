@@ -39,7 +39,7 @@ func (c *internalCollection) Name() string {
 }
 
 // ListBonds возвращает список облигаций из коллекции
-func (c *internalCollection) ListBonds(ctx context.Context, tx *data.TX, duration Duration) ([]*Report, error) {
+func (c *internalCollection) ListBonds(ctx context.Context, tx *data.TX, limit int, duration Duration) ([]*Report, error) {
 	filterSQL := `
 SELECT bond_id, index
 FROM collection_bonds
@@ -47,7 +47,7 @@ WHERE collection_id = ? and duration = ?
 ORDER BY index ASC
 `
 
-	entities, err := tx.Reports.List(filterSQL, c.id, getAge(duration))
+	entities, err := tx.Reports.List(limit, filterSQL, c.id, getAge(duration))
 	if err != nil {
 		return nil, err
 	}

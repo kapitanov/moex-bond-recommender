@@ -2,6 +2,7 @@ package web
 
 import "mime"
 
+// ConfigureEndpoints настраивает роутинг для веб приложения
 func (s *service) ConfigureEndpoints() {
 	s.router.GET("/", s.pagesController.IndexPage)
 	s.router.GET("/search", s.pagesController.SearchPage)

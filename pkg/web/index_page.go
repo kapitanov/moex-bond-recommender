@@ -11,6 +11,7 @@ import (
 	"github.com/kapitanov/moex-bond-recommender/pkg/recommender"
 )
 
+// IndexPage обрабатывает запросы "GET /"
 func (ctrl *pagesController) IndexPage(c *gin.Context) {
 	model, err := NewIndexPageModel(ctrl.app)
 	if err != nil {
@@ -21,19 +22,27 @@ func (ctrl *pagesController) IndexPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "pages/index", model)
 }
 
+// IndexPageModel - модель для страницы "pages/index.html"
 type IndexPageModel struct {
 	Collections []CollectionModel
 }
 
+// NewIndexPageModel создает объекты типа IndexPageModel
 func NewIndexPageModel(app app.App) (*IndexPageModel, error) {
-	collections := app.ListCollections()
+	u, err := app.NewUnitOfWork(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer u.Close()
+
+	collections := u.ListCollections()
 
 	model := IndexPageModel{
 		Collections: make([]CollectionModel, len(collections)),
 	}
 
 	for i, collection := range collections {
-		c, err := NewCollectionModel(app, collection)
+		c, err := NewCollectionModel(u, collection)
 		if err != nil {
 			return nil, err
 		}
@@ -44,6 +53,7 @@ func NewIndexPageModel(app app.App) (*IndexPageModel, error) {
 	return &model, nil
 }
 
+// CollectionModel - модель коллекции для страницы "pages/index.html"
 type CollectionModel struct {
 	ID       string
 	Name     string
@@ -51,10 +61,10 @@ type CollectionModel struct {
 	Bonds    []CollectionItemModel
 }
 
-func NewCollectionModel(app app.App, collection recommender.Collection) (*CollectionModel, error) {
-	// TODO нужен рефакторинг - не хватает unit of work
+// NewCollectionModel создает объекты типа CollectionModel
+func NewCollectionModel(u app.UnitOfWork, collection recommender.Collection) (*CollectionModel, error) {
 	duration := recommender.Duration5Year
-	_, reports, err := app.GetCollection(context.Background(), collection.ID(), duration)
+	reports, err := u.ListCollectionBonds(collection.ID(), duration)
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +87,7 @@ func NewCollectionModel(app app.App, collection recommender.Collection) (*Collec
 	return &model, nil
 }
 
+// CollectionItemModel - модель элемента коллекции для страницы "pages/index.html"
 type CollectionItemModel struct {
 	Bond   *data.Bond
 	Issuer *data.Issuer
