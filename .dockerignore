@@ -1,6 +1,13 @@
 .env
 .idea
+README.md
+Dockerfile
+docker-compose.yaml
+LICENSE
 ./moex-bond-recommender
 ./moex-bond-recommender.exe
 ./cmd/moex-bond-recommender/moex-bond-recommender
 ./cmd/moex-bond-recommender/moex-bond-recommender.exe
+.editorconfig
+.dockerignore
+.gitignore

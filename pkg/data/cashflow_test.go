@@ -25,7 +25,7 @@ func TestCashFlowItem_Scan(t *testing.T) {
 		panic(err)
 	}
 
-	mock.ExpectQuery("SELECT \\* FROM \"cashflow\"").
+	mock.ExpectQuery("SELECT \\* FROM \"cashflows\"").
 		WillReturnRows(
 			sqlmock.NewRows([]string{"bond_id", "type", "value_rub"}).
 				AddRow(123, "C", 45.67))

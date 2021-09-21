@@ -86,7 +86,7 @@ func attachMoexUrlFlag(cmd *cobra.Command, value *string) {
 }
 
 func attachListenAddressFlag(cmd *cobra.Command, value *string) {
-	envVarName := "LISTEN_ADDRR"
+	envVarName := "LISTEN_ADDR"
 	defaultValue := os.Getenv(envVarName)
 	if defaultValue == "" {
 		defaultValue = web.DefaultAddress

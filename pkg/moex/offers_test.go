@@ -141,8 +141,9 @@ func TestProvider_ListOffers(t *testing.T) {
 		assert.Equal("RUB", offers[0].FaceUnit)
 		assert.Equal(float64(100), *offers[0].Price)
 		assert.Nil(offers[0].Value)
-		assert.Equal("", offers[0].Agent)
-		assert.Equal(moex.GenericOffer, offers[0].Type)
+		assert.Nil(offers[0].Agent)
+		assert.NotNil(offers[0].Type)
+		assert.Equal(moex.GenericOffer, *offers[0].Type)
 	}
 
 	{
@@ -160,8 +161,9 @@ func TestProvider_ListOffers(t *testing.T) {
 		assert.Equal("RUB", offers[0].FaceUnit)
 		assert.Equal(float64(100), *offers[0].Price)
 		assert.Nil(offers[0].Value)
-		assert.Equal("", offers[0].Agent)
-		assert.Equal(moex.GenericOffer, offers[0].Type)
+		assert.Nil(offers[0].Agent)
+		assert.NotNil(offers[0].Type)
+		assert.Equal(moex.GenericOffer, *offers[0].Type)
 	}
 
 	{

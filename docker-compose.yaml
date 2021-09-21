@@ -1,0 +1,29 @@
+version: "3"
+services:
+    bond_recommender:
+        image: bond_recommender:latest
+        build: .
+        command: run
+        container_name: bond_recommender
+        restart: always
+        depends_on:
+            - postgres
+        env_file: .env
+        environment:
+            LISTEN_ADDR: "0.0.0.0:80"
+            POSTGRES_URL: "postgres://postgres:postgres@postgres:5432/bond_recommender"
+        ports:
+            - 5000:80
+
+    postgres:
+        image: postgres:13
+        restart: always
+        container_name: bond_recommender_postgres
+        environment:
+            POSTGRES_USER: "postgres"
+            POSTGRES_PASSWORD: "postgres"
+            PGDATA: "/var/lib/postgresql/data"
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+volumes:
+    pgdata: {}
