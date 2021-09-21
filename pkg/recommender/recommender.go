@@ -48,7 +48,8 @@ const (
 	Duration5Year Duration = "5y"
 )
 
-var durations = []Duration{Duration1Year, Duration2Year, Duration3Year, Duration4Year, Duration5Year}
+// Durations содержит список всех возможных значений Duration
+var Durations = []Duration{Duration1Year, Duration2Year, Duration3Year, Duration4Year, Duration5Year}
 
 // Collection содержит данные коллекции рекомендаций
 type Collection interface {

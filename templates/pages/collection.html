@@ -1,0 +1,108 @@
+{{define "head"}}
+<title>{{ .Name }} - Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">
+			<i class="bi bi-house"></i>
+		</a></li>
+		<li class="breadcrumb-item">
+			Коллекции
+		</li>
+		<li class="breadcrumb-item active" aria-current="page">
+			{{ .Name }}
+		</li>
+	</ol>
+</nav>
+
+<h1>{{ .Name }}</h1>
+
+<nav class="navbar navbar-expand navbar-light bg-light">
+	<div class="container-fluid">
+	<span class="navbar-text">
+      До погашения:
+    </span>
+		<ul id="bondsTabs" class="nav navbar-nav me-auto" role="tablist">
+			{{ range $duration, $items := .ItemsPerDuration }}
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" id="tab-{{ $duration }}" data-bs-toggle="tab" href="#tabpane-{{ $duration }}"
+				   role="tab" aria-controls="contact" aria-selected="false">
+					{{ $duration | formatDuration }}
+				</a>
+			</li>
+			{{ end }}
+		</ul>
+	</div>
+</nav>
+
+<div class="tab-content" id="myTabContent">
+	{{ range $duration, $items := .ItemsPerDuration }}
+	<div class="tab-pane fade" id="tabpane-{{ $duration }}" role="tabpanel" aria-labelledby="tab-{{ $duration }}">
+		<table class="table table-sm table-hover table-clickable text-end">
+			<thead>
+			<tr>
+				<th>ISIN</th>
+				<th>Облигация</th>
+				<th>Погашение</th>
+				<th>Текущая&nbsp;цена</th>
+				<th>Сумма&nbsp;инвестиций</th>
+				<th>Прибыль</th>
+				<th><i class="bi bi-caret-down-fill"></i> Доходность</th>
+			</tr>
+			</thead>
+			<tbody class="font-monospace">
+			{{ range $i, $item := $items }}
+			<tr>
+				<td>
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						{{ $item.Bond.ISIN }}
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						<code>{{ $item.Bond.ShortName }}</code>
+					</a>
+				</td>
+				<td title="{{ $item.Bond.MaturityDate | formatDate }}">
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						<code>Через {{ $item.Bond.MaturityDate | formatDaysTillMaturity }} дней</code>
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						<code>{{ $item.Report.OpenPrice | formatPercent }}</code>
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						<code>{{ $item.Report.OpenValue | formatMoney $item.Report.Currency }}</code>
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						<code>{{ $item.Report.ProfitLoss | formatMoney $item.Report.Currency }}</code>
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $item.Bond.ISIN }}">
+						<code>{{ $item.Report.InterestRate | formatPercent }}</code>
+					</a>
+				</td>
+			</tr>
+			{{ end }}
+			</tbody>
+		</table>
+	</div>
+	{{ end }}
+</div>
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var firstTabEl = document.querySelector('#bondsTabs li:first-child a');
+		var firstTab = bootstrap.Tab.getOrCreateInstance(firstTabEl);
+		firstTab.show();
+	});
+</script>
+{{end}}
+

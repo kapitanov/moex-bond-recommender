@@ -1,0 +1,237 @@
+{{define "head"}}
+<title>Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">
+			<i class="bi bi-house"></i>
+		</a></li>
+		<li class="breadcrumb-item">
+			Облигации
+		</li>
+		<li class="breadcrumb-item active" aria-current="page">
+			{{ .Bond.FullName }}
+		</li>
+	</ol>
+</nav>
+
+<div>
+	<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
+	{{ if eq .Bond.IsHighRisk true }}
+	<span class="badge align-top bg-danger" title="Эта облигация относится к сектору повышенного инвестиционного риска">
+		<i class="bi bi-exclamation-square-fill"></i> Риск
+	</span>
+	{{ end }}
+	{{ if eq .Bond.QualifiedOnly true }}
+	<span class="badge align-top bg-secondary" title="Эта облигация доступна только для квалифицированных инвесторов">
+		<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
+	</span>
+	{{ end }}
+</div>
+
+<div class="card w-100 mb-2">
+	<div class="card-body">
+		<h5 class="card-title">Сведения</h5>
+	</div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">ISIN</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.ISIN }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Краткое наименование</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.ShortName }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Полное наименование</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.FullName }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Дата погашения</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.MaturityDate | formatDate }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Частота выплаты купонов</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.CouponFrequency }} в год</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Эмитент</div>
+			<span class="font-monospace ms-4 text-end">{{ .Issuer.Name }}</span>
+		</li>
+	</ul>
+</div>
+
+<div class="card w-100 mb-2">
+	<div class="card-body">
+		<h5 class="card-title">
+			<a data-bs-toggle="collapse" href="#details" role="button" aria-expanded="false" aria-controls="details" class="d-block">
+				Детали
+			</a>
+		</h5>
+	</div>
+	<ul id="details" class="list-group list-group-flush collapse">
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Код ценной бумаги на Московской бирже</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.SecurityID }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Торгуется ли облигация</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.IsTraded | formatBool }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Доступна ли бумага только для квалифицированных инвесторов</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.QualifiedOnly | formatBool }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Относится ли бумага к сектору высокого риска</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.IsHighRisk | formatBool }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Тип облигации</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.Type | formatBondType }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Первоначальный номинал облигации</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.InitialFaceValue | formatMoney .Bond.FaceUnit }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Дата выпуска облигации</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.IssueDate | formatDate }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Уровень листинга</div>
+			<span class="font-monospace ms-4 text-end">{{ .Bond.ListingLevel }}</span>
+		</li>
+	</ul>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 g-4 mb-2">
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">Открытие позиции</h5>
+			</div>
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Цена открытия</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.OpenPrice | formatPercent }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Номинал на дату открытия</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.OpenFaceValue | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">НКД на дату открытия</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.OpenAccruedInterest | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Комиссия</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.OpenFee | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Сумма инвестиций</div>
+					{{ $openValue := getFullOpenValue .Report }}
+					<span class="font-monospace ms-4 text-end">{{ $openValue | formatMoney .Report.Currency }}</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">Закрытие позиции</h5>
+			</div>
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Выплаты по купонам</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.CouponPayments | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Выплаты по амортизации</div>
+					<span
+						class="font-monospace ms-4 text-end">{{ .Report.AmortizationPayments | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Выплаты по погашению</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.MaturityPayment | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Суммарные выплаты</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.Revenue | formatMoney .Report.Currency }}</span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between align-items-start">
+					<div class="me-auto">Налоги</div>
+					<span class="font-monospace ms-4 text-end">{{ .Report.Taxes | formatMoney .Report.Currency }}</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div class="card w-100 mb-2">
+	<div class="card-body">
+		<h5 class="card-title">Прибыль/убыток</h5>
+	</div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Прибыль (сумма)</div>
+			<span class="font-monospace ms-4 text-end">{{ .Report.ProfitLoss | formatMoney .Report.Currency }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Прибыль (доля от инвестиций)</div>
+			<span class="font-monospace ms-4 text-end">{{ .Report.RelativeProfitLoss | formatPercent }}</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Доходность</div>
+			<span class="font-monospace ms-4 text-end">{{ .Report.InterestRate | formatPercent }} годовых</span>
+		</li>
+	</ul>
+	<div class="card-body">
+		{{ $fullRevenue := getFullRevenue .Report }}
+		<p>
+		Проинвестировав сегодня <span class="text-primary">{{ $openValue | formatMoney .Report.Currency }}</span>,
+		через {{ .Report.DaysTillMaturity }} дней вы получите
+		<span class="text-primary">{{ $fullRevenue | formatMoney .Report.Currency }}</span>
+		или <span class="text-primary">+ {{ .Report.ProfitLoss | formatMoney .Report.Currency }}</span>
+		по отношению к первоначальным вложениям.
+		</p>
+		<p>
+		Т.о. ваша прибыль составит
+		<span class="text-primary">{{ .Report.RelativeProfitLoss | formatPercent }}</span> по отношению ко вложенной сумме или
+		<span class="text-primary">{{ .Report.InterestRate | formatPercent }} годовых</span>.
+		</p>
+	</div>
+</div>
+
+<div class="card w-100">
+	<div class="card-body">
+		<h5 class="card-title">Выплаты</h5>
+		<table class="table table-sm table-hover table-clickable text-end">
+			<thead>
+			<tr>
+				<th><i class="bi bi-caret-up-fill"></i> Дата выплаты</th>
+				<th>Тип выплаты</th>
+				<th>Сумма выплаты</th>
+			</tr>
+			</thead>
+			<tbody class="font-monospace">
+			{{ range $i, $item := .Report.CashFlow }}
+			<tr>
+				<td>
+					{{ $item.Date |formatDate }}
+				</td>
+				<td>
+					{{ $item.Type | formatCashFlowItemType }}
+				</td>
+				<td>
+					{{ $item.ValueRub | formatMoney "RUB" }}
+				</td>
+			</tr>
+			{{ end }}
+			</tbody>
+		</table>
+	</div>
+</div>
+{{end}}

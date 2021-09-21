@@ -61,7 +61,7 @@ ORDER BY index ASC
 
 // Rebuild выполняет обновление данных коллекции
 func (c *internalCollection) Rebuild(ctx context.Context, tx *data.TX) error {
-	for _, duration := range durations {
+	for _, duration := range Durations {
 		err := tx.CollectionBondReferences.Rebuild(c.id, getAge(duration), c.filterSQL(duration))
 		if err != nil {
 			return err

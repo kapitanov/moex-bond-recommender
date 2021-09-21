@@ -1,0 +1,80 @@
+{{define "head"}}
+<title>Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<h1>
+	Результаты поиска по <small>&quot;{{ .Query }}&quot;</small>
+</h1>
+
+<form class="d-flex my-4" action="/search" method="get">
+	<input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="q" value="{{ .Query }}" id="searchbox">
+	<button class="btn btn-primary" type="submit">
+		<i class="bi bi-search"></i>
+	</button>
+</form>
+
+{{ if gt .TotalCount 0 }}
+<table class="table table-sm table-hover table-clickable">
+	<thead>
+	<tr>
+		<th>ISIN</th>
+		<th colspan="2">Название</th>
+		<th colspan="2">Погашение</th>
+	</tr>
+	</thead>
+	<tbody class="font-monospace">
+	{{ range $i, $item := .Bonds }}
+	<tr>
+		<td>
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.ISIN }}
+			</a>
+		</td>
+		<td>
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.ShortName }}
+			</a>
+		</td>
+		<td>
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.FullName }}
+			</a>
+		</td>
+		<td title="{{ $item.MaturityDate | formatDate }}">
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.MaturityDate | formatDate }}
+			</a>
+		</td>
+		<td title="{{ $item.MaturityDate | formatDate }}">
+			<a href="/bonds/{{ $item.ISIN }}">
+				Через {{ $item.MaturityDate | formatDaysTillMaturity }} дн.
+			</a>
+		</td>
+	</tr>
+	{{ end }}
+	</tbody>
+</table>
+
+{{ if gt .TotalCount (len .Bonds) }}
+<p>
+	Показано {{ len .Bonds }} облигаций из найденных {{ .TotalCount}}.
+	Попробуйте уточнить поисковый запрос.
+</p>
+{{ end }}
+
+{{ else }}
+<p>
+	Ничего не найдено
+</p>
+{{ end }}
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var searchbox = document.getElementById('searchbox');
+		searchbox.focus();
+		setTimeout(function(){ searchbox.selectionStart = searchbox.selectionEnd = searchbox.value.length; }, 0);
+	});
+</script>
+
+{{ end }}

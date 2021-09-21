@@ -32,7 +32,7 @@ const (
 	// CorporateBond - корпоративные облигации
 	CorporateBond BondType = BondType(moex.CorporateBond)
 
-	// IFIBond - облигации ИФИ
+	// IFIBond - облигации МФО
 	IFIBond BondType = BondType(moex.IFIBond)
 
 	// EuroBond - еврооблигации

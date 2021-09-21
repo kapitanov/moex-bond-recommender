@@ -2,6 +2,8 @@ package recommender
 
 import (
 	"context"
+	"sort"
+	"strings"
 
 	"github.com/kapitanov/moex-bond-recommender/pkg/data"
 )
@@ -17,6 +19,10 @@ func (s *service) ListCollections() []Collection {
 		array[i] = coll
 		i++
 	}
+
+	sort.Slice(array, func(i, j int) bool {
+		return strings.Compare(array[i].ID(), array[j].ID()) < 0
+	})
 
 	return array
 }

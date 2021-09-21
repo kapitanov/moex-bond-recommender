@@ -1,0 +1,26 @@
+{{define "head"}}
+<title>404 - Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/">
+			<i class="bi bi-house"></i>
+		</a></li>
+		<li class="breadcrumb-item">
+			Облигации
+		</li>
+		<li class="breadcrumb-item active" aria-current="page">
+			{{ . }}
+		</li>
+	</ol>
+</nav>
+
+<h1>
+	404 Не найдено
+</h1>
+<p>
+	Запрошенная облигация <c>{{ . }}</c> не найдена.
+</p>
+{{end}}

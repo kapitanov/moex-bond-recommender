@@ -1,0 +1,20 @@
+table.table-clickable th,
+table.table-clickable td {
+	padding: 0;
+}
+
+table.table-clickable th > a,
+table.table-clickable td > a {
+	display: block;
+	padding: 4px;
+	text-decoration: none;
+}
+
+.navbar .nav[role="tablist"] > .nav-item .nav-link.active {
+	color: #0d6efd !important;
+	text-decoration: underline;
+}
+
+main {
+	padding: 80px 0 0;
+}

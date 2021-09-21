@@ -1,0 +1,42 @@
+{{define "head"}}
+<title>Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<section class="py-3 text-center container">
+	<div class="row py-lg-5">
+		<div class="col-lg-6 col-md-8 mx-auto">
+			<h1 class="fw-light">Рекомендации по облигациям</h1>
+			<p class="lead text-muted">
+				Сервис предоставляет краткую аналитику по облигациям Московской биржи.
+
+			</p>
+		</div>
+	</div>
+</section>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+	{{ range $i, $item := .Collections }}
+	{{ with $item }}
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">
+					{{.Name}}
+				</h5>
+				<p class="card-text">
+					В этой коллекции {{ .Bonds | len }} облигаций
+				</p>
+				<p class="card-text">
+					<a href="/collections/{{.ID}}" class="btn btn-primary">
+						Перейти к коллекции
+						<i class="bi bi-arrow-right"></i>
+					</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	{{ end }}
+	{{ end }}
+</div>
+{{end}}
