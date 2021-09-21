@@ -177,15 +177,15 @@
 	<ul class="list-group list-group-flush">
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (сумма)</div>
-			<span class="font-monospace ms-4 text-end">{{ .Report.ProfitLoss | formatMoney .Report.Currency }}</span>
+			<span class="font-monospace ms-4 text-end">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (доля от инвестиций)</div>
-			<span class="font-monospace ms-4 text-end">{{ .Report.RelativeProfitLoss | formatPercent }}</span>
+			<span class="font-monospace ms-4 text-end">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Доходность</div>
-			<span class="font-monospace ms-4 text-end">{{ .Report.InterestRate | formatPercent }} годовых</span>
+			<span class="font-monospace ms-4 text-end">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
 		</li>
 	</ul>
 	<div class="card-body">
@@ -194,7 +194,7 @@
 		Проинвестировав сегодня <span class="text-primary">{{ $openValue | formatMoney .Report.Currency }}</span>,
 		через {{ .Report.DaysTillMaturity }} дней вы получите
 		<span class="text-primary">{{ $fullRevenue | formatMoney .Report.Currency }}</span>
-		или <span class="text-primary">+ {{ .Report.ProfitLoss | formatMoney .Report.Currency }}</span>
+		или <span class="text-primary">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 		по отношению к первоначальным вложениям.
 		</p>
 		<p>
@@ -220,7 +220,7 @@
 			{{ range $i, $item := .Report.CashFlow }}
 			<tr>
 				<td>
-					{{ $item.Date |formatDate }}
+					{{ $item.Date | formatDate }}
 				</td>
 				<td>
 					{{ $item.Type | formatCashFlowItemType }}

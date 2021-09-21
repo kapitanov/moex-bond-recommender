@@ -70,7 +70,7 @@ func WithLogger(logger *log.Logger) Option {
 	}
 }
 
-// WithLogger задает адрес для прослушивания
+// WithListenAddress задает адрес для прослушивания
 func WithListenAddress(address string) Option {
 	return func(s *service) error {
 		s.address = address
@@ -78,7 +78,7 @@ func WithListenAddress(address string) Option {
 	}
 }
 
-// WithLogger задает экземпляр приложения app.App
+// WithApp задает экземпляр приложения app.App
 func WithApp(app app.App) Option {
 	return func(s *service) error {
 		s.app = app

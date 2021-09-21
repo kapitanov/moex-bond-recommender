@@ -30,6 +30,8 @@ func defineFunctions() template.FuncMap {
 	fns["getFullRevenue"] = getFullRevenue
 	fns["formatBool"] = formatBool
 	fns["formatBondType"] = formatBondType
+	fns["formatPercentWithSign"] = formatPercentWithSign
+	fns["formatMoneyWithSign"] = formatMoneyWithSign
 
 	return fns
 }
@@ -247,4 +249,72 @@ func formatBondType(v interface{}) (interface{}, error) {
 	}
 
 	return v, nil
+}
+
+func formatPercentWithSign(v interface{}) (template.HTML, error) {
+	str := ""
+
+	switch t := v.(type) {
+	case float64:
+		sign := "+"
+		if t < 0 {
+			sign = "-"
+		}
+		str = fmt.Sprintf("%s %0.2f%%", sign, math.Abs(t))
+		break
+	case *float64:
+		if t != nil {
+			sign := "+"
+			if *t < 0 {
+				sign = "-"
+			}
+			str = fmt.Sprintf("%s %0.2f%%", sign, math.Abs(*t))
+		}
+		break
+	}
+
+	str = template.HTMLEscapeString(str)
+	return template.HTML(str), nil
+}
+
+func formatMoneyWithSign(currency string, v interface{}) (template.HTML, error) {
+	str := ""
+	switch t := v.(type) {
+	case float64:
+		sign := "+"
+		if t < 0 {
+			sign = "-"
+		}
+		str = fmt.Sprintf("%s %0.2f", sign, math.Abs(t))
+		break
+	case *float64:
+		if t != nil {
+			sign := "+"
+			if *t < 0 {
+				sign = "-"
+			}
+			str = fmt.Sprintf("%s %0.2f", sign, math.Abs(*t))
+		}
+		break
+	}
+
+	if str != "" {
+		switch currency {
+		case "USD":
+			str = fmt.Sprintf("$%s", str)
+			break
+		case "EUR":
+			str = fmt.Sprintf("%s %s", str, euroSymbol)
+			break
+		case "RUB":
+			str = fmt.Sprintf("%s %s", str, rubSymbol)
+			break
+		default:
+			str = fmt.Sprintf("%s %s", str, currency)
+			break
+		}
+	}
+
+	str = template.HTMLEscapeString(str)
+	return template.HTML(str), nil
 }
