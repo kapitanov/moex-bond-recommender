@@ -72,6 +72,14 @@ func (s *service) Do(tx *data.TX, req Request) (*Result, error) {
 	text := req.Text
 	text = strings.TrimSpace(text)
 	text = regexp.MustCompile("[^a-zA-Z0-9а-яА-Я]+").ReplaceAllString(text, "")
+	if text == "" {
+		res := Result{
+			Bonds:      make([]*data.Bond, 0),
+			TotalCount: 0,
+		}
+		return &res, nil
+	}
+
 	text = fmt.Sprintf("%s:*", text)
 
 	skip := req.Skip

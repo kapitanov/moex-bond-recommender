@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -17,6 +18,12 @@ import (
 func (ctrl *pagesController) SearchPage(c *gin.Context) {
 	query, exists := c.GetQuery("q")
 	if !exists {
+		c.Redirect(http.StatusFound, "/")
+		return
+	}
+
+	query = strings.TrimSpace(query)
+	if query == "" {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
