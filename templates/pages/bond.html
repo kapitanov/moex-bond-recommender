@@ -74,27 +74,27 @@
 	<ul class="list-group list-group-flush">
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">ISIN</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.ISIN }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.ISIN }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Краткое наименование</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.ShortName }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.ShortName }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Полное наименование</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.FullName }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.FullName }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Дата погашения</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.MaturityDate | formatDate }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.MaturityDate | formatDate }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Частота выплаты купонов</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.CouponFrequency }} в год</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.CouponFrequency }} в год</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Эмитент</div>
-			<span class="font-monospace ms-4 text-end">{{ .Issuer.Name }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Issuer.Name }}</span>
 		</li>
 	</ul>
 </div>
@@ -114,46 +114,46 @@
 	<ul id="details" class="list-group list-group-flush collapse d-print-flex">
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Код ценной бумаги на Московской бирже</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.SecurityID }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.SecurityID }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Торгуется ли облигация</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.IsTraded | formatBool }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.IsTraded | formatBool }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Доступна ли бумага только для квалифицированных инвесторов</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.QualifiedOnly | formatBool }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.QualifiedOnly | formatBool }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Относится ли бумага к сектору высокого риска</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.IsHighRisk | formatBool }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.IsHighRisk | formatBool }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Тип облигации</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.Type | formatBondType }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.Type | formatBondType }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Первоначальный номинал облигации</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.InitialFaceValue | formatMoney .Bond.FaceUnit }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.InitialFaceValue | formatMoney .Bond.FaceUnit }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Дата выпуска облигации</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.IssueDate | formatDate }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.IssueDate | formatDate }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Уровень листинга</div>
-			<span class="font-monospace ms-4 text-end">{{ .Bond.ListingLevel }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Bond.ListingLevel }}</span>
 		</li>
 		{{ if .Issuer.INN }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">ИНН эмитента</div>
-			<span class="font-monospace ms-4 text-end">{{ .Issuer.INN }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Issuer.INN }}</span>
 		</li>
 		{{ end }}
 		{{ if .Issuer.OKPO }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">ОКПО эмитента</div>
-			<span class="font-monospace ms-4 text-end">{{ .Issuer.OKPO }}</span>
+			<span class="text-monospace ms-4 text-end">{{ .Issuer.OKPO }}</span>
 		</li>
 		{{ end }}
 	</ul>
@@ -168,25 +168,25 @@
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Цена открытия</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.OpenPrice | formatPercent }}</span>
+					<span class="text-monospace ms-4 text-end">{{ .Report.OpenPrice | formatPercent }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Номинал на дату открытия</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.OpenFaceValue | formatMoney .Report.Currency }}</span>
+					<span class="text-monospace ms-4 text-end">{{ .Report.OpenFaceValue | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">НКД на дату открытия</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.OpenAccruedInterest | formatMoney .Report.Currency }}</span>
+					<span class="text-monospace ms-4 text-end">{{ .Report.OpenAccruedInterest | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Комиссия</div>
 					<span
-						class="font-monospace ms-4 text-end">{{ .Report.OpenFee | formatMoney .Report.Currency }}</span>
+						class="text-monospace ms-4 text-end">{{ .Report.OpenFee | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Сумма инвестиций</div>
 					{{ $openValue := getFullOpenValue .Report }}
-					<span class="font-monospace ms-4 text-end">{{ $openValue | formatMoney .Report.Currency }}</span>
+					<span class="text-monospace ms-4 text-end">{{ $openValue | formatMoney .Report.Currency }}</span>
 				</li>
 			</ul>
 		</div>
@@ -199,25 +199,25 @@
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Выплаты по купонам</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.CouponPayments | formatMoney .Report.Currency }}</span>
+					<span class="text-monospace ms-4 text-end">{{ .Report.CouponPayments | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Выплаты по амортизации</div>
 					<span
-						class="font-monospace ms-4 text-end">{{ .Report.AmortizationPayments | formatMoney .Report.Currency }}</span>
+						class="text-monospace ms-4 text-end">{{ .Report.AmortizationPayments | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Выплаты по погашению</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.MaturityPayment | formatMoney .Report.Currency }}</span>
+					<span class="text-monospace ms-4 text-end">{{ .Report.MaturityPayment | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Суммарные выплаты</div>
 					<span
-						class="font-monospace ms-4 text-end">{{ .Report.Revenue | formatMoney .Report.Currency }}</span>
+						class="text-monospace ms-4 text-end">{{ .Report.Revenue | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Налоги</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.Taxes | formatMoney .Report.Currency }}</span>
+					<span class="text-monospace ms-4 text-end">{{ .Report.Taxes | formatMoney .Report.Currency }}</span>
 				</li>
 			</ul>
 		</div>
@@ -233,35 +233,35 @@
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (сумма)</div>
 			<span
-				class="font-monospace ms-4 text-end text-success">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
+				class="text-monospace ms-4 text-end text-success">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 		</li>
 		{{ else }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (сумма)</div>
 			<span
-				class="font-monospace ms-4 text-end text-danger">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
+				class="text-monospace ms-4 text-end text-danger">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 		</li>
 		{{ end }}
 		{{ if gt .Report.RelativeProfitLoss 0.0 }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (доля от инвестиций)</div>
-			<span class="font-monospace ms-4 text-end text-success">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
+			<span class="text-monospace ms-4 text-end text-success">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
 		</li>
 		{{ else }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (доля от инвестиций)</div>
-			<span class="font-monospace ms-4 text-end text-danger">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
+			<span class="text-monospace ms-4 text-end text-danger">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
 		</li>
 		{{ end }}
 		{{ if gt .Report.InterestRate 0.0 }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Доходность</div>
-			<span class="font-monospace ms-4 text-end text-success">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
+			<span class="text-monospace ms-4 text-end text-success">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
 		</li>
 		{{ else }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Доходность</div>
-			<span class="font-monospace ms-4 text-end text-danger">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
+			<span class="text-monospace ms-4 text-end text-danger">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
 		</li>
 		{{ end }}
 	</ul>
@@ -311,11 +311,11 @@
 		<table class="table table-sm table-hover table-clickable text-end">
 			<thead>
 			<tr>
-				<th>
+				<th class="text-start">
 					<span class="d-none d-md-block"><i class="bi bi-caret-up-fill"></i> Дата выплаты</span>
 					<span class="d-block d-md-none text-sm"><i class="bi bi-caret-up-fill"></i> Дата</span>
 				</th>
-				<th>
+				<th class="text-start">
 					<span class="d-none d-md-block">Тип выплаты</span>
 					<span class="d-block d-md-none text-sm">Тип</span>
 				</th>
@@ -325,13 +325,13 @@
 				</th>
 			</tr>
 			</thead>
-			<tbody class="font-monospace">
+			<tbody class="text-monospace">
 			{{ range $i, $item := .Report.CashFlow }}
 			<tr>
-				<td>
+				<td class="text-start">
 					{{ $item.Date | formatDate }}
 				</td>
-				<td>
+				<td class="text-start">
 					{{ $item.Type | formatCashFlowItemType }}
 				</td>
 				<td>

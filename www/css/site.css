@@ -14,6 +14,10 @@ table.table-clickable td > a {
 	table.table-clickable a {
 		font-size: small;
 	}
+
+	.nav.nav-tabs > .nav-item >.nav-link {
+		padding: 0.5rem 0.4em !important;
+	}
 }
 
 .navbar .nav[role="tablist"] > .nav-item .nav-link.active {
@@ -27,4 +31,9 @@ main {
 
 .text-sm {
 	font-size: small;
+}
+
+.text-monospace {
+	font-family: 'JetBrains Mono', monospace !important;
+	font-size: 14px;
 }

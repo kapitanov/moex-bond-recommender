@@ -37,28 +37,8 @@
 	</div>
 </div>
 
-<!--
-<nav class="navbar navbar-expand navbar-light bg-light">
-	<div class="container-fluid">
-	<span class="navbar-text">
-      До погашения:
-    </span>
-		<ul id="bondsTabs" class="nav navbar-nav me-auto" role="tablist">
-			{{ range $duration, $items := .ItemsPerDuration }}
-			<li class="nav-item" role="presentation">
-				<a class="nav-link" id="tab-{{ $duration }}" data-bs-toggle="tab" href="#tabpane-{{ $duration }}"
-				   role="tab" aria-controls="contact" aria-selected="false">
-					{{ $duration | formatDuration }}
-				</a>
-			</li>
-			{{ end }}
-		</ul>
-	</div>
-</nav>
--->
-
 <ul id="bondsTabs" class="nav nav-tabs" role="tablist">
-	<li class="nav-item">
+	<li class="nav-item d-none d-sm-block">
 		<a class="nav-link disabled px-1">До погашения</a>
 	</li>
 	{{ range $duration, $items := .ItemsPerDuration }}
@@ -107,7 +87,7 @@
 				</th>
 			</tr>
 			</thead>
-			<tbody class="font-monospace text-break">
+			<tbody class="text-monospace text-break">
 			{{ range $i, $item := $items }}
 			<tr>
 				<td class="text-start">

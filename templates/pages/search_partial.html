@@ -4,10 +4,10 @@
 	<tr>
 		<th>ISIN</th>
 		<th colspan="2">Название</th>
-		<th colspan="2">Погашение</th>
+		<th colspan="2" class="text-end">Погашение</th>
 	</tr>
 	</thead>
-	<tbody class="font-monospace">
+	<tbody class="text-monospace">
 	{{ range $i, $item := .Bonds }}
 	<tr>
 		<td>
@@ -22,17 +22,18 @@
 		</td>
 		<td>
 			<a href="/bonds/{{ $item.ISIN }}">
-				{{ $item.FullName }}
+				<span class="d-none d-md-block">{{ $item.FullName }}</span>
 			</a>
 		</td>
-		<td title="{{ $item.MaturityDate | formatDate }}">
+		<td title="{{ $item.MaturityDate | formatDate }}" class="text-end">
 			<a href="/bonds/{{ $item.ISIN }}">
 				{{ $item.MaturityDate | formatDate }}
 			</a>
 		</td>
-		<td title="{{ $item.MaturityDate | formatDate }}">
+		<td title="{{ $item.MaturityDate | formatDate }}" class="text-end">
 			<a href="/bonds/{{ $item.ISIN }}">
-				Через {{ $item.MaturityDate | formatDaysTillMaturity }} дн.
+				<span class="d-none d-md-block">Через {{ $item.MaturityDate | formatDaysTillMaturity }} дн.</span>
+				<span class="d-block d-md-none text-sm">{{ $item.MaturityDate | formatDaysTillMaturity }} дн.</span>
 			</a>
 		</td>
 	</tr>
