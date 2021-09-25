@@ -15,53 +15,8 @@
 </form>
 
 {{ if gt .TotalCount 0 }}
-<table class="table table-sm table-hover table-clickable">
-	<thead>
-	<tr>
-		<th>ISIN</th>
-		<th colspan="2">Название</th>
-		<th colspan="2">Погашение</th>
-	</tr>
-	</thead>
-	<tbody class="font-monospace">
-	{{ range $i, $item := .Bonds }}
-	<tr>
-		<td>
-			<a href="/bonds/{{ $item.ISIN }}">
-				{{ $item.ISIN }}
-			</a>
-		</td>
-		<td>
-			<a href="/bonds/{{ $item.ISIN }}">
-				{{ $item.ShortName }}
-			</a>
-		</td>
-		<td>
-			<a href="/bonds/{{ $item.ISIN }}">
-				{{ $item.FullName }}
-			</a>
-		</td>
-		<td title="{{ $item.MaturityDate | formatDate }}">
-			<a href="/bonds/{{ $item.ISIN }}">
-				{{ $item.MaturityDate | formatDate }}
-			</a>
-		</td>
-		<td title="{{ $item.MaturityDate | formatDate }}">
-			<a href="/bonds/{{ $item.ISIN }}">
-				Через {{ $item.MaturityDate | formatDaysTillMaturity }} дн.
-			</a>
-		</td>
-	</tr>
-	{{ end }}
-	</tbody>
-</table>
 
-{{ if gt .TotalCount (len .Bonds) }}
-<p>
-	Показано {{ len .Bonds }} облигаций из найденных {{ .TotalCount}}.
-	Попробуйте уточнить поисковый запрос.
-</p>
-{{ end }}
+{{ include "pages/search_partial" }}
 
 {{ else }}
 <p>
@@ -75,6 +30,43 @@
 		searchbox.focus();
 		setTimeout(function(){ searchbox.selectionStart = searchbox.selectionEnd = searchbox.value.length; }, 0);
 	});
+
+	function showMore(skip) {
+		document.getElementById('showMoreBtn').setAttribute('disabled', 'disabled');
+		document.getElementById('showMoreBtn_normal').style.display = 'none';
+		document.getElementById('showMoreBtn_preloader').style.display = 'inline';
+
+		var query = location.protocol + '//' + location.host + '/search?q=' +
+			encodeURIComponent('{{ .Query }}') + '&skip=' +
+			encodeURIComponent(skip) + '&partial=true';
+		console.log(`goto: ${query}`);
+		fetch(query)
+			.then(function (response) {
+				return response.text();
+			})
+			.then(function (html) {
+				var dom = new DOMParser().parseFromString(html, 'text/html');
+				var rows = dom.querySelectorAll('table tbody tr');
+				var table = document.querySelector('#bonds_table tbody');
+				dom.querySelectorAll('table tbody tr').forEach(function (row) {
+					table.appendChild(row);
+				})
+
+				var moreBlock = dom.getElementById('more_block');
+				if (!!moreBlock) {
+					document.getElementById('more_block').innerHTML = moreBlock.outerHTML;
+				} else {
+					document.getElementById('more_block').innerHTML = '';
+				}
+				window.scrollTo(0,document.body.scrollHeight);
+			})
+			.catch(function (e) {
+				console.log('ERROR: ' + e);
+				document.getElementById('showMoreBtn').removeAttribute('disabled');
+				document.getElementById('showMoreBtn_normal').style.display = 'inline';
+				document.getElementById('showMoreBtn_preloader').style.display = 'none';
+			});
+	}
 </script>
 
 {{ end }}

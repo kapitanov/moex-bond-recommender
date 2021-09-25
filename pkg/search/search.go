@@ -18,6 +18,9 @@ type Request struct {
 	Limit int
 }
 
+// DefaultLimit содержит значение по умолчанию для Request.Limit
+const DefaultLimit = 10
+
 // Result содержит результаты поиска облигаций
 type Result struct {
 	Bonds      []*data.Bond
@@ -89,7 +92,7 @@ func (s *service) Do(tx *data.TX, req Request) (*Result, error) {
 
 	limit := req.Limit
 	if limit <= 0 {
-		limit = 10
+		limit = DefaultLimit
 	}
 
 	bonds, totalCount, err := tx.Search.Exec(text, skip, limit)

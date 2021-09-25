@@ -1,0 +1,67 @@
+{{ if gt (len .Bonds) 0 }}
+<table id="bonds_table" class="table table-sm table-hover table-clickable">
+	<thead>
+	<tr>
+		<th>ISIN</th>
+		<th colspan="2">Название</th>
+		<th colspan="2">Погашение</th>
+	</tr>
+	</thead>
+	<tbody class="font-monospace">
+	{{ range $i, $item := .Bonds }}
+	<tr>
+		<td>
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.ISIN }}
+			</a>
+		</td>
+		<td>
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.ShortName }}
+			</a>
+		</td>
+		<td>
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.FullName }}
+			</a>
+		</td>
+		<td title="{{ $item.MaturityDate | formatDate }}">
+			<a href="/bonds/{{ $item.ISIN }}">
+				{{ $item.MaturityDate | formatDate }}
+			</a>
+		</td>
+		<td title="{{ $item.MaturityDate | formatDate }}">
+			<a href="/bonds/{{ $item.ISIN }}">
+				Через {{ $item.MaturityDate | formatDaysTillMaturity }} дн.
+			</a>
+		</td>
+	</tr>
+	{{ end }}
+	</tbody>
+</table>
+
+<div id="more_block">
+	{{ if lt .DisplayedCount .TotalCount }}
+
+	{{ $blockName := printf "showMore_%d" .Skip }}
+
+	<div id="content_{{ .Skip }}">
+		<p>
+			Показано {{ .DisplayedCount }} облигаций из найденных {{ .TotalCount }}.
+		</p>
+		<p>
+			<button id="showMoreBtn" class="btn btn-outline-primary" onclick="showMore({{ .DisplayedCount }}); return false;">
+				<span id="showMoreBtn_normal"> Показать еще</span>
+				<span id="showMoreBtn_preloader" style="display: none;">
+					<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Загрузка...
+				</span>
+			</button>
+		</p>
+	</div>
+	{{ else }}
+	<p>
+		Показано {{ .DisplayedCount }} облигаций из найденных {{ .TotalCount }}.
+	</p>
+	{{ end }}
+</div>
+{{ end }}
