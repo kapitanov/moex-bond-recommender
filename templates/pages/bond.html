@@ -1,9 +1,9 @@
 {{define "head"}}
-<title>Рекомендации по облигациям</title>
+<title>{{ .Bond.FullName }} - Рекомендации по облигациям</title>
 {{end}}
 
 {{define "content"}}
-<nav aria-label="breadcrumb">
+<nav aria-label="breadcrumb" class="d-print-none">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item"><a href="/">
 			<i class="bi bi-house"></i>
@@ -17,7 +17,7 @@
 	</ol>
 </nav>
 
-<div>
+<div class="d-none d-sm-block">
 	<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
 	{{ if eq .Bond.IsHighRisk true }}
 	<span class="badge align-top bg-danger" title="Эта облигация относится к сектору повышенного инвестиционного риска">
@@ -29,6 +29,42 @@
 			<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
 		</span>
 	{{ end }}
+	<span class="float-end h-100 d-inline-block d-print-none">
+		<a class="btn btn-outline-primary" title="Посмотреть облигацию на сайте Московской биржи"
+		   href="https://www.moex.com/ru/issue.aspx?code={{- .Bond.SecurityID }}" target="_blank">
+			<i class="bi bi-link-45deg"></i>
+		</a>
+		<button class="btn btn-outline-primary" title="Поделиться" onclick="share();">
+			<i class="bi bi-share"></i>
+		</button>
+	</span>
+</div>
+
+<div class="d-block d-sm-none">
+	<div>
+		<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
+		{{ if eq .Bond.IsHighRisk true }}
+		<span class="badge align-top bg-danger"
+			  title="Эта облигация относится к сектору повышенного инвестиционного риска">
+				<i class="bi bi-exclamation-square-fill"></i> Риск
+			</span>
+		{{ end }}
+		{{ if eq .Bond.QualifiedOnly true }}
+		<span class="badge align-top bg-secondary"
+			  title="Эта облигация доступна только для квалифицированных инвесторов">
+				<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
+			</span>
+		{{ end }}
+	</div>
+	<div class="d-print-none">
+		<a class="btn btn-outline-primary d-block mb-2" title="Посмотреть облигацию на сайте Московской биржи"
+		   href="https://www.moex.com/ru/issue.aspx?code={{- .Bond.SecurityID }}" target="_blank">
+			<i class="bi bi-link-45deg"></i> На сайт Московской биржи
+		</a>
+		<a class="btn btn-outline-primary d-block mb-2" title="Поделиться" onclick="share(); return false;" href="#">
+			<i class="bi bi-share"></i> Поделиться
+		</a>
+	</div>
 </div>
 
 <div class="card w-100 mb-2">
@@ -64,15 +100,18 @@
 </div>
 
 <div class="card w-100 mb-2">
-	<div class="card-body">
+	<div class="card-body ">
 		<h5 class="card-title">
 			<a data-bs-toggle="collapse" href="#details" role="button" aria-expanded="false" aria-controls="details"
-			   class="d-block">
+			   class="d-block d-print-none">
 				Детали
 			</a>
+			<span class="d-none d-print-block">
+				Детали
+			</span>
 		</h5>
 	</div>
-	<ul id="details" class="list-group list-group-flush collapse">
+	<ul id="details" class="list-group list-group-flush collapse d-print-flex">
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Код ценной бумаги на Московской бирже</div>
 			<span class="font-monospace ms-4 text-end">{{ .Bond.SecurityID }}</span>
@@ -105,6 +144,18 @@
 			<div class="me-auto">Уровень листинга</div>
 			<span class="font-monospace ms-4 text-end">{{ .Bond.ListingLevel }}</span>
 		</li>
+		{{ if .Issuer.INN }}
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">ИНН эмитента</div>
+			<span class="font-monospace ms-4 text-end">{{ .Issuer.INN }}</span>
+		</li>
+		{{ end }}
+		{{ if .Issuer.OKPO }}
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">ОКПО эмитента</div>
+			<span class="font-monospace ms-4 text-end">{{ .Issuer.OKPO }}</span>
+		</li>
+		{{ end }}
 	</ul>
 </div>
 
@@ -178,19 +229,41 @@
 		<h5 class="card-title">Прибыль/убыток</h5>
 	</div>
 	<ul class="list-group list-group-flush">
+		{{ if gt .Report.ProfitLoss 0.0 }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (сумма)</div>
 			<span
-				class="font-monospace ms-4 text-end">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
+				class="font-monospace ms-4 text-end text-success">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 		</li>
+		{{ else }}
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Прибыль (сумма)</div>
+			<span
+				class="font-monospace ms-4 text-end text-danger">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
+		</li>
+		{{ end }}
+		{{ if gt .Report.RelativeProfitLoss 0.0 }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (доля от инвестиций)</div>
-			<span class="font-monospace ms-4 text-end">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
+			<span class="font-monospace ms-4 text-end text-success">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
 		</li>
+		{{ else }}
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Прибыль (доля от инвестиций)</div>
+			<span class="font-monospace ms-4 text-end text-danger">{{ .Report.RelativeProfitLoss | formatPercentWithSign }}</span>
+		</li>
+		{{ end }}
+		{{ if gt .Report.InterestRate 0.0 }}
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Доходность</div>
-			<span class="font-monospace ms-4 text-end">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
+			<span class="font-monospace ms-4 text-end text-success">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
 		</li>
+		{{ else }}
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Доходность</div>
+			<span class="font-monospace ms-4 text-end text-danger">{{ .Report.InterestRate | formatPercentWithSign }} годовых</span>
+		</li>
+		{{ end }}
 	</ul>
 	<div class="card-body">
 		{{ $fullRevenue := getFullRevenue .Report }}
@@ -201,12 +274,34 @@
 			или <span class="text-primary">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 			по отношению к первоначальным вложениям.
 		</p>
+		{{ if gt .Report.ProfitLoss 0.0 }}
 		<p>
 			Т.о. ваша прибыль составит
 			<span class="text-primary">{{ .Report.RelativeProfitLoss | formatPercent }}</span> по отношению ко вложенной
 			сумме или
 			<span class="text-primary">{{ .Report.InterestRate | formatPercent }} годовых</span>.
 		</p>
+		{{ else }}
+		<p>
+			Т.о. ваш убыток составит
+			<span class="text-primary">{{ .Report.RelativeProfitLoss | formatPercent }}</span> по отношению ко вложенной
+			сумме или
+			<span class="text-primary">{{ .Report.InterestRate | formatPercent }} годовых</span>.
+		</p>
+		{{ end }}
+		{{ if lt .Report.ProfitLoss 0.0 }}
+		<p class="text-danger">
+			<i class="bi bi-exclamation-circle"></i> Данная облигация не рекомендуется к инвестированию в данный момент,
+			поскольку доходность по ней отрицательна.
+		</p>
+		{{ end }}
+		{{ if eq .Bond.IsHighRisk true }}
+		<p class="text-danger">
+			<i class="bi bi-exclamation-circle"></i> Данная облигация не рекомендуется к инвестированию,
+			поскольку ее эмитент относится к <a href="https://www.moex.com/ru/markets/risksector/">сектору повышенного
+			инвестиционного риска</a>.
+		</p>
+		{{ end }}
 	</div>
 </div>
 
@@ -239,4 +334,35 @@
 		</table>
 	</div>
 </div>
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+	<div id="copiedToClipboardToast" class="toast align-items-center text-white bg-primary border-0" role="alert"
+		 aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div class="toast-body">
+				Ссылка на страницу была скопирована в буфер обмена
+			</div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+					aria-label="Close"></button>
+		</div>
+	</div>
+</div>
+<script>
+	function share() {
+		if (!!navigator.share) {
+			navigator.share({
+				title: 'Рекомендации по облигациям: {{ .Bond.FullName }}',
+				url: location
+			}).catch(console.error);
+		} else {
+			var toast = new bootstrap.Toast(document.getElementById('copiedToClipboardToast'))
+			navigator.clipboard.writeText(location)
+				.then(function () {
+					toast.show();
+					setTimeout(1000, function () {
+						toast.hide();
+					});
+				}).catch(console.error);
+		}
+	}
+</script>
 {{end}}

@@ -7,7 +7,7 @@
 	Результаты поиска по <small>&quot;{{ .Query }}&quot;</small>
 </h1>
 
-<form class="d-flex my-4" action="/search" method="get">
+<form class="d-flex my-4 d-print-none" action="/search" method="get">
 	<input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск" name="q" value="{{ .Query }}" id="searchbox" required>
 	<button class="btn btn-primary" type="submit">
 		<i class="bi bi-search"></i>
