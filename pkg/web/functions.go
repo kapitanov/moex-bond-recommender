@@ -169,7 +169,7 @@ func formatDaysTillMaturity(v interface{}) (template.HTML, error) {
 
 	days := int(math.Round(d.Sub(time.Now().UTC()).Hours() / 24.0))
 
-	str := fmt.Sprintf("%d.", days)
+	str := fmt.Sprintf("%d", days)
 	str = template.HTMLEscapeString(str)
 	return template.HTML(str), nil
 }

@@ -3,7 +3,7 @@
 {{end}}
 
 {{define "content"}}
-<nav aria-label="breadcrumb" class="d-print-none">
+<nav aria-label="breadcrumb" class="d-print-none d-none d-sm-block">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item"><a href="/">
 			<i class="bi bi-house"></i>
@@ -311,9 +311,18 @@
 		<table class="table table-sm table-hover table-clickable text-end">
 			<thead>
 			<tr>
-				<th><i class="bi bi-caret-up-fill"></i> Дата выплаты</th>
-				<th>Тип выплаты</th>
-				<th>Сумма выплаты</th>
+				<th>
+					<span class="d-none d-md-block"><i class="bi bi-caret-up-fill"></i> Дата выплаты</span>
+					<span class="d-block d-md-none text-sm"><i class="bi bi-caret-up-fill"></i> Дата</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Тип выплаты</span>
+					<span class="d-block d-md-none text-sm">Тип</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Сумма выплаты</span>
+					<span class="d-block d-md-none text-sm">Сумма</span>
+				</th>
 			</tr>
 			</thead>
 			<tbody class="font-monospace">
@@ -334,6 +343,7 @@
 		</table>
 	</div>
 </div>
+
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
 	<div id="copiedToClipboardToast" class="toast align-items-center text-white bg-primary border-0" role="alert"
 		 aria-live="assertive" aria-atomic="true">

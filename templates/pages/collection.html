@@ -3,7 +3,7 @@
 {{end}}
 
 {{define "content"}}
-<nav aria-label="breadcrumb" class="d-print-none">
+<nav aria-label="breadcrumb" class="d-print-none d-none d-sm-block">
 	<ol class="breadcrumb">
 		<li class="breadcrumb-item"><a href="/">
 			<i class="bi bi-house"></i>
@@ -17,8 +17,27 @@
 	</ol>
 </nav>
 
-<h1>{{ .Name }}</h1>
+<div class="d-none d-sm-block">
+	<h1 class="d-inline-block">{{ .Name }}</h1>
+	<span class="float-end h-100 d-inline-block d-print-none">
+		<button class="btn btn-outline-primary" title="Поделиться" onclick="share();">
+			<i class="bi bi-share"></i>
+		</button>
+	</span>
+</div>
 
+<div class="d-block d-sm-none">
+	<div>
+		<h1 class="d-inline-block">{{ .Name }}</h1>
+	</div>
+	<div class="d-print-none">
+		<a class="btn btn-outline-primary d-block mb-2" title="Поделиться" onclick="share(); return false;" href="#">
+			<i class="bi bi-share"></i> Поделиться
+		</a>
+	</div>
+</div>
+
+<!--
 <nav class="navbar navbar-expand navbar-light bg-light">
 	<div class="container-fluid">
 	<span class="navbar-text">
@@ -36,6 +55,21 @@
 		</ul>
 	</div>
 </nav>
+-->
+
+<ul id="bondsTabs" class="nav nav-tabs" role="tablist">
+	<li class="nav-item">
+		<a class="nav-link disabled px-1">До погашения</a>
+	</li>
+	{{ range $duration, $items := .ItemsPerDuration }}
+	<li class="nav-item" role="presentation">
+		<a class="nav-link" id="tab-{{ $duration }}" data-bs-toggle="tab" href="#tabpane-{{ $duration }}"
+		   role="tab" aria-controls="contact" aria-selected="false">
+			{{ $duration | formatDuration }}
+		</a>
+	</li>
+	{{ end }}
+</ul>
 
 <div class="tab-content" id="myTabContent">
 	{{ range $duration, $items := .ItemsPerDuration }}
@@ -43,51 +77,79 @@
 		<table class="table table-sm table-hover table-clickable text-end">
 			<thead>
 			<tr>
-				<th>ISIN</th>
-				<th>Облигация</th>
-				<th>Погашение</th>
-				<th>Текущая&nbsp;цена</th>
-				<th>Сумма&nbsp;инвестиций</th>
-				<th>Прибыль</th>
-				<th><i class="bi bi-caret-down-fill"></i> Доходность</th>
+				<th class="text-start">
+					<span class="d-none d-md-block">ISIN</span>
+					<span class="d-block d-md-none text-sm">ISIN</span>
+				</th>
+				<th class="text-start">
+					<span class="d-none d-md-block">Облигация</span>
+					<span class="d-block d-md-none text-sm"></span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Погашение</span>
+					<span class="d-block d-md-none text-sm">Пог.</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Текущая&nbsp;цена</span>
+					<span class="d-block d-md-none text-sm">Цена</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Сумма&nbsp;инвестиций</span>
+					<span class="d-block d-md-none text-sm">&Sigma;</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Прибыль</span>
+					<span class="d-block d-md-none text-sm">P/L</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block"><i class="bi bi-caret-down-fill"></i> Доходность</span>
+					<span class="d-block d-md-none text-sm"><i class="bi bi-caret-down-fill"></i> Дох.</span>
+				</th>
 			</tr>
 			</thead>
-			<tbody class="font-monospace">
+			<tbody class="font-monospace text-break">
 			{{ range $i, $item := $items }}
 			<tr>
-				<td>
+				<td class="text-start">
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
 						{{ $item.Bond.ISIN }}
 					</a>
 				</td>
-				<td>
+				<td class="text-start">
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
-						<code>{{ $item.Bond.ShortName }}</code>
+						<span class="d-none d-xl-block">{{ $item.Bond.FullName }}</span>
+						<span class="d-none d-md-block d-xl-none ">{{ $item.Bond.ShortName }}</span>
+						<span class="d-block d-md-none">{{ $item.Bond.ShortName }}</span>
 					</a>
 				</td>
 				<td title="{{ $item.Bond.MaturityDate | formatDate }}">
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
-						<code>Через {{ $item.Bond.MaturityDate | formatDaysTillMaturity }} дней</code>
+						<span class="d-none d-md-block">
+							Через {{ $item.Bond.MaturityDate | formatDaysTillMaturity }} дней
+						</span>
+						<span class="d-block d-md-none">
+							{{ $item.Bond.MaturityDate | formatDaysTillMaturity }} дн.
+						</span>
 					</a>
 				</td>
 				<td>
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
-						<code>{{ $item.Report.OpenPrice | formatPercent }}</code>
+						{{ $item.Report.OpenPrice | formatPercent }}
 					</a>
 				</td>
 				<td>
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
-						<code>{{ $item.Report.OpenValue | formatMoney $item.Report.Currency }}</code>
+						{{ $item.Report.OpenValue | formatMoney $item.Report.Currency }}
 					</a>
 				</td>
 				<td>
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
-						<code>{{ $item.Report.ProfitLoss | formatMoney $item.Report.Currency }}</code>
+						{{ $item.Report.ProfitLoss | formatMoney $item.Report.Currency }}
 					</a>
 				</td>
 				<td>
 					<a href="/bonds/{{ $item.Bond.ISIN }}">
-						<code>{{ $item.Report.InterestRate | formatPercent }}</code>
+						{{ $item.Report.InterestRate | formatPercent }}
 					</a>
 				</td>
 			</tr>
@@ -97,12 +159,43 @@
 	</div>
 	{{ end }}
 </div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+	<div id="copiedToClipboardToast" class="toast align-items-center text-white bg-primary border-0" role="alert"
+		 aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div class="toast-body">
+				Ссылка на страницу была скопирована в буфер обмена
+			</div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+					aria-label="Close"></button>
+		</div>
+	</div>
+</div>
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
-		var firstTabEl = document.querySelector('#bondsTabs li:first-child a');
+		var firstTabEl = document.querySelector('#bondsTabs li a:not(.disabled)');
 		var firstTab = bootstrap.Tab.getOrCreateInstance(firstTabEl);
 		firstTab.show();
 	});
+
+	function share() {
+		if (!!navigator.share) {
+			navigator.share({
+				title: 'Рекомендации по облигациям: {{ .Name }}',
+				url: location
+			}).catch(console.error);
+		} else {
+			var toast = new bootstrap.Toast(document.getElementById('copiedToClipboardToast'))
+			navigator.clipboard.writeText(location)
+				.then(function () {
+					toast.show();
+					setTimeout(1000, function () {
+						toast.hide();
+					});
+				}).catch(console.error);
+		}
+	}
 </script>
 {{end}}
 

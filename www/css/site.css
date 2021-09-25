@@ -10,6 +10,12 @@ table.table-clickable td > a {
 	text-decoration: none;
 }
 
+@media (max-width: 576px) {
+	table.table-clickable a {
+		font-size: small;
+	}
+}
+
 .navbar .nav[role="tablist"] > .nav-item .nav-link.active {
 	color: #0d6efd !important;
 	text-decoration: underline;
@@ -17,4 +23,8 @@ table.table-clickable td > a {
 
 main {
 	padding: 80px 0 0;
+}
+
+.text-sm {
+	font-size: small;
 }
