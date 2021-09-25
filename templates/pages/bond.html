@@ -21,13 +21,13 @@
 	<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
 	{{ if eq .Bond.IsHighRisk true }}
 	<span class="badge align-top bg-danger" title="Эта облигация относится к сектору повышенного инвестиционного риска">
-		<i class="bi bi-exclamation-square-fill"></i> Риск
-	</span>
+			<i class="bi bi-exclamation-square-fill"></i> Риск
+		</span>
 	{{ end }}
 	{{ if eq .Bond.QualifiedOnly true }}
 	<span class="badge align-top bg-secondary" title="Эта облигация доступна только для квалифицированных инвесторов">
-		<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
-	</span>
+			<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
+		</span>
 	{{ end }}
 </div>
 
@@ -66,7 +66,8 @@
 <div class="card w-100 mb-2">
 	<div class="card-body">
 		<h5 class="card-title">
-			<a data-bs-toggle="collapse" href="#details" role="button" aria-expanded="false" aria-controls="details" class="d-block">
+			<a data-bs-toggle="collapse" href="#details" role="button" aria-expanded="false" aria-controls="details"
+			   class="d-block">
 				Детали
 			</a>
 		</h5>
@@ -128,7 +129,8 @@
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Комиссия</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.OpenFee | formatMoney .Report.Currency }}</span>
+					<span
+						class="font-monospace ms-4 text-end">{{ .Report.OpenFee | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Сумма инвестиций</div>
@@ -159,7 +161,8 @@
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Суммарные выплаты</div>
-					<span class="font-monospace ms-4 text-end">{{ .Report.Revenue | formatMoney .Report.Currency }}</span>
+					<span
+						class="font-monospace ms-4 text-end">{{ .Report.Revenue | formatMoney .Report.Currency }}</span>
 				</li>
 				<li class="list-group-item d-flex justify-content-between align-items-start">
 					<div class="me-auto">Налоги</div>
@@ -177,7 +180,8 @@
 	<ul class="list-group list-group-flush">
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (сумма)</div>
-			<span class="font-monospace ms-4 text-end">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
+			<span
+				class="font-monospace ms-4 text-end">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
 		</li>
 		<li class="list-group-item d-flex justify-content-between align-items-start">
 			<div class="me-auto">Прибыль (доля от инвестиций)</div>
@@ -191,16 +195,17 @@
 	<div class="card-body">
 		{{ $fullRevenue := getFullRevenue .Report }}
 		<p>
-		Проинвестировав сегодня <span class="text-primary">{{ $openValue | formatMoney .Report.Currency }}</span>,
-		через {{ .Report.DaysTillMaturity }} дней вы получите
-		<span class="text-primary">{{ $fullRevenue | formatMoney .Report.Currency }}</span>
-		или <span class="text-primary">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
-		по отношению к первоначальным вложениям.
+			Проинвестировав сегодня <span class="text-primary">{{ $openValue | formatMoney .Report.Currency }}</span>,
+			через {{ .Report.DaysTillMaturity }} дней вы получите
+			<span class="text-primary">{{ $fullRevenue | formatMoney .Report.Currency }}</span>
+			или <span class="text-primary">{{ .Report.ProfitLoss | formatMoneyWithSign .Report.Currency }}</span>
+			по отношению к первоначальным вложениям.
 		</p>
 		<p>
-		Т.о. ваша прибыль составит
-		<span class="text-primary">{{ .Report.RelativeProfitLoss | formatPercent }}</span> по отношению ко вложенной сумме или
-		<span class="text-primary">{{ .Report.InterestRate | formatPercent }} годовых</span>.
+			Т.о. ваша прибыль составит
+			<span class="text-primary">{{ .Report.RelativeProfitLoss | formatPercent }}</span> по отношению ко вложенной
+			сумме или
+			<span class="text-primary">{{ .Report.InterestRate | formatPercent }} годовых</span>.
 		</p>
 	</div>
 </div>

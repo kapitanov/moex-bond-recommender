@@ -27,6 +27,15 @@
 
 Сервис будет доступен по адресу `http://localhost:5000`.
 
+## Конфигурация
+
+| Переменная окружения  | Значение по умолчанию                                          | Описание                      |
+| --------------------- | -------------------------------------------------------------- | ----------------------------- |
+| `POSTGRES_URL`        | `postgres://postgres:postgres@localhost:5432/bond_recommender` | URL для соединения с Postgres |
+| `ISS_URL`             | `https://iss.moex.com`                                         | URL сервиса ISS               |
+| `LISTEN_ADDR`         | `0.0.0.0:5000`                                                 | Конечная точка для HTTP       |
+| `GOOGLE_ANALYTICS_ID` |                                                                | ID для Google Analytics       |
+
 ## Лицензия
 
 [MIT](LICENSE)

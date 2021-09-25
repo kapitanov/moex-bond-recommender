@@ -95,3 +95,14 @@ func attachListenAddressFlag(cmd *cobra.Command, value *string) {
 	usage := fmt.Sprintf("Web app listen address (defaults to $%s)", envVarName)
 	cmd.Flags().StringVarP(value, "address", "a", defaultValue, usage)
 }
+
+func attachGoogleAnalyticsFlag(cmd *cobra.Command, value *string) {
+	envVarName := "GOOGLE_ANALYTICS_ID"
+	defaultValue := os.Getenv(envVarName)
+	if defaultValue == "" {
+		defaultValue = ""
+	}
+
+	usage := fmt.Sprintf("Google Analytics ID (defaults to $%s)", envVarName)
+	cmd.Flags().StringVar(value, "ga-id", defaultValue, usage)
+}

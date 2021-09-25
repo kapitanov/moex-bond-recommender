@@ -19,11 +19,12 @@ func init() {
 	rootCommand.AddCommand(cmd)
 
 	var (
-		postgresConnString, moexURL, address string
+		postgresConnString, moexURL, address, googleAnalyticsID string
 	)
 	attachPostgresUrlFlag(cmd, &postgresConnString)
 	attachMoexUrlFlag(cmd, &moexURL)
 	attachListenAddressFlag(cmd, &address)
+	attachGoogleAnalyticsFlag(cmd, &googleAnalyticsID)
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		ctx := CreateCancellableContext()
@@ -40,7 +41,10 @@ func init() {
 		}
 
 		webappLogger := log.New(log.Writer(), "web:  ", log.Flags())
-		webapp, err := web.New(web.WithListenAddress(address), web.WithLogger(webappLogger), web.WithApp(app))
+		webapp, err := web.New(
+			web.WithListenAddress(address),
+			web.WithLogger(webappLogger), web.WithApp(app),
+			web.WithGoogleAnalyticsID(googleAnalyticsID))
 		if err != nil {
 			return err
 		}

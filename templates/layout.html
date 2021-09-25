@@ -20,22 +20,23 @@
 	<meta name="msapplication-TileColor" content="#da532c">
 	<meta name="theme-color" content="#0d6efd">
 
-	{{template "head" .}}
+	{{ template "head" . }}
+	{{ include "google_analytics" }}
 </head>
 <body class="d-flex flex-column h-100">
 
 <header>
-	{{include "navbar"}}
+	{{ include "navbar" }}
 </header>
 
 <main class="flex-shrink-0">
 	<div class="container">
-		{{template "content" .}}
+		{{ template "content" . }}
 	</div>
 </main>
 
 <footer class="footer mt-auto py-3 bg-light">
-	{{include "footer"}}
+	{{ include "footer" }}
 </footer>
 </body>
 </html>

@@ -50,11 +50,11 @@ func New(options ...Option) (Service, error) {
 		Extension:    ".html",
 		Master:       "layout",
 		Partials:     []string{},
-		Funcs:        defineFunctions(),
+		Funcs:        defineFunctions(s.googleAnalyticsID),
 		DisableCache: false,
 		Delims:       goview.Delims{Left: "{{", Right: "}}"},
 	})
-	s.pagesController = &pagesController{s.app}
+	s.pagesController = &pagesController{app: s.app}
 	s.ConfigureEndpoints()
 	return s, nil
 }
@@ -86,14 +86,23 @@ func WithApp(app app.App) Option {
 	}
 }
 
+// WithGoogleAnalyticsID задает ID для Google Analytics
+func WithGoogleAnalyticsID(value string) Option {
+	return func(s *service) error {
+		s.googleAnalyticsID = value
+		return nil
+	}
+}
+
 type service struct {
-	router          *gin.Engine
-	logger          *log.Logger
-	address         string
-	done            *sync.WaitGroup
-	app             app.App
-	pagesController *pagesController
-	server          *http.Server
+	router            *gin.Engine
+	logger            *log.Logger
+	address           string
+	done              *sync.WaitGroup
+	app               app.App
+	pagesController   *pagesController
+	server            *http.Server
+	googleAnalyticsID string
 }
 
 // Start запускает веб приложение

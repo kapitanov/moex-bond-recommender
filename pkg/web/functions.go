@@ -18,7 +18,7 @@ const (
 	rubSymbol  = "\u20bd"
 )
 
-func defineFunctions() template.FuncMap {
+func defineFunctions(googleAnalyticsID string) template.FuncMap {
 	fns := make(template.FuncMap)
 	fns["formatDate"] = formatDate
 	fns["formatPercent"] = formatPercent
@@ -32,6 +32,10 @@ func defineFunctions() template.FuncMap {
 	fns["formatBondType"] = formatBondType
 	fns["formatPercentWithSign"] = formatPercentWithSign
 	fns["formatMoneyWithSign"] = formatMoneyWithSign
+
+	fns["googleAnalyticsID"] = func() (string, error) {
+		return googleAnalyticsID, nil
+	}
 
 	return fns
 }
