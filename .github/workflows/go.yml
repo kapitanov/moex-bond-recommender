@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  go:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -17,10 +17,10 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.17
-        
+
     - name: Format
-      run: gofmt -s -l .
-      
+      run: if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then exit 1; fi
+
     - name: Vet
       run: go vet ./...
 
