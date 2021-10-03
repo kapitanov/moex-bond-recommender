@@ -1,0 +1,300 @@
+{{define "head"}}
+<title>Калькулятор инвестиций - Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<h1>
+	Калькулятор инвестиций
+</h1>
+
+
+<div id="paramsEditor" style="display: none;">
+	<v-suggest-calc-form :collections="collections"></v-suggest-calc-form>
+</div>
+
+<div id="paramsView" class="card col-12">
+	<div class="card-body">
+		<h4 class="card-title d-flex">
+			<span class="flex-fill">Параметры расчета</span>
+			<a href="#" onclick="openEditor(); return false;" class="float-right">Изменить</a>
+		</h4>
+	</div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Инвестируемая сумма</div>
+			<span class="text-monospace ms-4 text-end">
+				{{ .Request.Amount | formatMoney "RUB" }}
+			</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Срок инвестиций</div>
+			<span class="text-monospace ms-4 text-end">
+				{{ .Request.MaxDurationRaw }} г.
+			</span>
+		</li>
+	</ul>
+	{{ with .Request.Parts }}
+	{{ range $i, $part := . }}
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Доля облигаций из коллекции <code>{{ .CollectionName }}</code></div>
+			<span class="text-monospace ms-4 text-end">
+				{{ .Weight | formatPercent }}
+			</span>
+		</li>
+	</ul>
+	{{ end }}
+	{{ end }}
+</div>
+
+<div class="card col-12 mt-4">
+	<div class="card-body">
+		<div class="card-title d-none d-md-block">
+			<h4 class="d-inline">Результат расчета</h4>
+			<span class="float-end h-100 d-inline-block d-print-none">
+				<a href="{{ .ShareUrl }}" class="share-link btn btn-outline-primary" title="Постоянная ссылка">
+					<i class="bi bi-link-45deg"></i> Постоянная ссылка
+				</a>
+				<a href="#" onclick="share(); return false;" class="btn btn-outline-primary" title="Поделиться">
+					<i class="bi bi-share"></i> Поделиться
+				</a>
+			</span>
+		</div>
+		<div class="card-title d-block d-md-none">
+			<h3 class="d-inline">Результат расчета</h3>
+		</div>
+		<div class="d-flex d-md-none flex-row justify-content-center gap-2 px-1">
+			<a href="{{ .ShareUrl }}" class="col-6 share-link btn btn-outline-primary" title="Постоянная ссылка">
+				<i class="bi bi-link-45deg"></i> Постоянная ссылка
+			</a>
+			<a href="#" onclick="share(); return false;" class="col-6 btn btn-outline-primary" title="Поделиться">
+				<i class="bi bi-share"></i> Поделиться
+			</a>
+		</div>
+	</div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Инвестируемая сумма</div>
+			<span class="text-monospace ms-4 text-end">
+					{{ .Portfolio.Amount | formatMoney "RUB" }}
+				</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Срок инвестирования</div>
+			<span class="text-monospace ms-4 text-end">
+					{{ .Portfolio.DurationDays }} дней
+				</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Прибыль</div>
+			<span class="text-monospace ms-4 text-end">
+					{{ .Portfolio.ProfitLoss | formatMoney "RUB" }}
+				</span>
+		</li>
+		<li class="list-group-item d-flex justify-content-between align-items-start">
+			<div class="me-auto">Доходность</div>
+			<span class="text-monospace ms-4 text-end">
+					{{ .Portfolio.InterestRate | formatPercent }}
+				</span>
+		</li>
+	</ul>
+	<div class="card-body">
+		<p>
+			Проинвестировав сегодня <span class="text-primary">{{ .Portfolio.Amount | formatMoney "RUB" }}</span>,
+			через {{ .Portfolio.DurationDays }} дней вы получите
+			<span class="text-primary">{{ .Portfolio.ProfitLoss | formatMoneyWithSign "RUB" }}</span>
+			по отношению к первоначальным вложениям.
+		</p>
+		<p>
+			Т.о. ваша прибыль составит
+			<span class="text-primary">{{ .Portfolio.RelativeProfitLoss | formatPercent }}</span> по отношению ко вложенной
+			сумме или
+			<span class="text-primary">{{ .Portfolio.InterestRate | formatPercent }} годовых</span>.
+		</p>
+	</div>
+
+	<div class="card-body">
+		<h5 class="card-subtitle mt-2 mb-2">Позиции</h5>
+		<table class="table table-sm table-hover table-clickable text-end">
+			<thead>
+			<tr>
+				<th class="text-start" colspan="2">
+					<span class="d-none d-md-block">Облигация</span>
+					<span class="d-block d-md-none text-sm"></span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Количество</span>
+					<span class="d-block d-md-none text-sm">Кол.</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Доля в портфеле</span>
+					<span class="d-block d-md-none text-sm">Доля</span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Доходность</span>
+					<span class="d-block d-md-none text-sm">Дох.</span>
+				</th>
+			</tr>
+			</thead>
+			<tbody class="text-monospace text-break">
+			{{ range $i, $position := .Portfolio.Positions }}
+			<tr>
+				<td class="text-start">
+					<a href="/bonds/{{ $position.Bond.ISIN }}">
+						{{ $position.Bond.ISIN }}
+					</a>
+				</td>
+				<td class="text-start">
+					<a href="/bonds/{{ $position.Bond.ISIN }}">
+						<span class="d-none d-xl-block">{{ $position.Bond.FullName }}</span>
+						<span class="d-none d-md-block d-xl-none ">{{ $position.Bond.ShortName }}</span>
+						<span class="d-block d-md-none">{{ $position.Bond.ShortName }}</span>
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $position.Bond.ISIN }}">
+						{{ $position.Quantity }}
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $position.Bond.ISIN }}">
+						{{ $position.Weight | formatPercentNoScale }}
+					</a>
+				</td>
+				<td>
+					<a href="/bonds/{{ $position.Bond.ISIN }}">
+						{{ $position.InterestRate | formatPercent }}
+					</a>
+				</td>
+			</tr>
+			{{ end }}
+			</tbody>
+		</table>
+	</div>
+
+	<div class="card-body">
+		<h5 class="card-subtitle mt-2 mb-2">Структура портфеля</h5>
+		<div>
+			<canvas id="structureChartPlaceholder" style="max-height: 250px;"></canvas>
+		</div>
+	</div>
+
+	<div class="card-body">
+		<h5 class="card-subtitle mt-2 mb-2">Выплаты</h5>
+		<div>
+			<canvas id="cashFlowChartPlaceholder" style="max-height: 250px;"></canvas>
+		</div>
+		<table class="table table-sm table-hover table-clickable text-end">
+			<thead>
+			<tr>
+				<th class="text-start">
+					<span class="d-none d-md-block">Дата</span>
+					<span class="d-block d-md-none text-sm"></span>
+				</th>
+				<th>
+					<span class="d-none d-md-block">Сумма выплат</span>
+					<span class="d-block d-md-none text-sm">Сумма.</span>
+				</th>
+				<th colspan="3">
+					<span class="d-none d-md-block">Типы выплат</span>
+					<span class="d-block d-md-none text-sm">Типы</span>
+				</th>
+			</tr>
+			</thead>
+			<tbody class="text-monospace text-break">
+			{{ range $i, $item := .CashFlow }}
+			<tr>
+				<td class="text-start">
+					{{ $item.Date | formatDate }}
+				</td>
+				<td>
+					{{ $item.Amount | formatMoney "RUB" }}
+				</td>
+				<td>
+					{{ if $item.HasCoupon }}
+						<span class="d-none d-md-block">Купон</span>
+						<span class="d-block d-md-none text-sm">К</span>
+					{{ end }}
+				</td>
+				<td>
+					{{ if $item.HasAmortization }}
+						<span class="d-none d-md-block">Амортизация</span>
+						<span class="d-block d-md-none text-sm">А</span>
+					{{ end }}
+				</td>
+				<td>
+					{{ if $item.HasMaturity }}
+						<span class="d-none d-md-block">Погашение</span>
+						<span class="d-block d-md-none text-sm">П</span>
+					{{ end }}
+				</td>
+			</tr>
+			{{ end }}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+	<div id="copiedToClipboardToast" class="toast align-items-center text-white bg-primary border-0" role="alert"
+		 aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div class="toast-body">
+				Ссылка на страницу была скопирована в буфер обмена
+			</div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+					aria-label="Close"></button>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+<script src="/js/suggest-charts.js"></script>
+<script src="/js/suggest-calc.js"></script>
+<script>
+	var shareUrl = {{ .ShareUrl }};
+	document.addEventListener('DOMContentLoaded', function () {
+		shareUrl = location.protocol + '//' + location.host + shareUrl;
+		var els = document.getElementsByClassName('share-link');
+		for (var i = 0; i < els.length; i++) {
+			els[i].setAttribute('href', shareUrl)
+		}
+
+		createCashFlowChart('cashFlowChartPlaceholder', {{ .CashFlow }});
+		createStructureChart('structureChartPlaceholder', {{ .Portfolio.Positions }});
+
+		new Vue({
+			el: '#paramsEditor',
+			data: {
+				collections: JSON.parse({{ json .Collections }})
+			}
+		});
+	});
+
+	function share() {
+		if (!!navigator.share) {
+			navigator.share({
+				title: 'Рекомендации по облигациям: расчеты по портфелю',
+				url: shareUrl
+			}).catch(console.error);
+		} else {
+			var toast = new bootstrap.Toast(document.getElementById('copiedToClipboardToast'))
+			navigator.clipboard.writeText(shareUrl)
+				.then(function () {
+					toast.show();
+					setTimeout(1000, function () {
+						toast.hide();
+					});
+				}).catch(console.error);
+		}
+	}
+
+	function openEditor(){
+		document.getElementById('paramsEditor').style.display = 'block';
+		document.getElementById('paramsView').style.display = 'none';
+	}
+</script>
+
+{{end}}
+

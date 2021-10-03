@@ -1,4 +1,4 @@
-package web
+package pages
 
 import (
 	"context"
@@ -12,21 +12,20 @@ import (
 )
 
 // BondPage обрабатывает запросы "GET /bonds/:id"
-func (ctrl *pagesController) BondPage(c *gin.Context) {
+func (ctrl *Controller) BondPage(c *gin.Context) {
 	id := c.Param("id")
 
-	model, err := NewBondPageModel(ctrl.app, id)
+	model, err := NewBondPageModel(ctrl.app, c, id)
 	if err != nil {
 		if err == recommender.ErrNotFound || err == data.ErrNotFound {
-			c.HTML(http.StatusNotFound, "pages/bond_not_found", id)
+			ctrl.renderHTML(c, http.StatusNotFound, "pages/bond_not_found", id)
 			return
 		}
 
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		panic(err)
 	}
 
-	c.HTML(http.StatusOK, "pages/bond", model)
+	ctrl.renderHTML(c, http.StatusOK, "pages/bond", model)
 }
 
 // BondPageModel - модель для страницы "pages/bond.html"
@@ -37,8 +36,8 @@ type BondPageModel struct {
 }
 
 // NewBondPageModel создает новые объекты типа BondPageModel
-func NewBondPageModel(app app.App, id string) (*BondPageModel, error) {
-	u, err := app.NewUnitOfWork(context.Background())
+func NewBondPageModel(app app.App, context context.Context, id string) (*BondPageModel, error) {
+	u, err := app.NewUnitOfWork(context)
 	if err != nil {
 		return nil, err
 	}

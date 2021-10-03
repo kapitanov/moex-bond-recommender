@@ -1,4 +1,4 @@
-package web
+package pages
 
 import (
 	"context"
@@ -12,14 +12,13 @@ import (
 )
 
 // IndexPage обрабатывает запросы "GET /"
-func (ctrl *pagesController) IndexPage(c *gin.Context) {
-	model, err := NewIndexPageModel(ctrl.app)
+func (ctrl *Controller) IndexPage(c *gin.Context) {
+	model, err := NewIndexPageModel(ctrl.app, c)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		panic(err)
 	}
 
-	c.HTML(http.StatusOK, "pages/index", model)
+	ctrl.renderHTML(c, http.StatusOK, "pages/index", model)
 }
 
 // IndexPageModel - модель для страницы "pages/index.html"
@@ -28,8 +27,8 @@ type IndexPageModel struct {
 }
 
 // NewIndexPageModel создает объекты типа IndexPageModel
-func NewIndexPageModel(app app.App) (*IndexPageModel, error) {
-	u, err := app.NewUnitOfWork(context.Background())
+func NewIndexPageModel(app app.App, context context.Context) (*IndexPageModel, error) {
+	u, err := app.NewUnitOfWork(context)
 	if err != nil {
 		return nil, err
 	}

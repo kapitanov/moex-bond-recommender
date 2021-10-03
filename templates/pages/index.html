@@ -9,20 +9,40 @@
 			<h1 class="fw-light">Рекомендации по облигациям</h1>
 			<p class="lead text-muted">
 				Сервис предоставляет краткую аналитику по облигациям Московской биржи.
-
 			</p>
 		</div>
 	</div>
 </section>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+<div class="row row-cols-1 mb-4">
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">
+					Калькулятор инвестиций
+				</h5>
+				<p class="card-text">
+					Калькулятор рассчитывает наиболее выгодный для инвестирования портфель облигаций на выбранный срок
+				</p>
+				<p class="card-text">
+					<a href="/suggest" class="btn btn-primary">
+						Перейти к калькулятору
+						<i class="bi bi-arrow-right"></i>
+					</a>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3 g-4">
 	{{ range $i, $item := .Collections }}
 	{{ with $item }}
 	<div class="col">
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">
-					{{.Name}}
+					{{ .Name }}
 				</h5>
 				<p class="card-text">
 					В этой коллекции {{ .Bonds | len }} облигаций

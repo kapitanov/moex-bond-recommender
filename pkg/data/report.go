@@ -77,11 +77,13 @@ WITH cte AS (
 SELECT reports.*
 FROM reports
 INNER JOIN cte ON cte.bond_id = reports.bond_id
-ORDER BY cte.index ASC
-LIMIT %d;
+ORDER BY cte.index ASC%s;
 `
-
-	sqlQuery = fmt.Sprintf(sqlQuery, filter, limit)
+	limitClause := ""
+	if limit > 0 {
+		limitClause = fmt.Sprintf("\nLIMIT %d", limit)
+	}
+	sqlQuery = fmt.Sprintf(sqlQuery, filter, limitClause)
 
 	var reports []*Report
 	err := repo.db.Raw(sqlQuery, values...).Scan(&reports).Error

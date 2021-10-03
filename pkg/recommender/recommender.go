@@ -24,6 +24,9 @@ type Service interface {
 	// Если отчет не найден, то возвращается ошибка ErrNotFound
 	GetReport(ctx context.Context, tx *data.TX, id int) (*Report, error)
 
+	// Suggest выполняет расчет предложений по инвестированию
+	Suggest(ctx context.Context, tx *data.TX, request *SuggestRequest) (*SuggestResult, error)
+
 	// Rebuild выполняет обновление данных рекомендаций
 	Rebuild(ctx context.Context, tx *data.TX) error
 }
@@ -120,7 +123,7 @@ type Report struct {
 	InterestRate float64
 
 	// Таблица выплат
-	CashFlow []CashFlowItem
+	CashFlow []*CashFlowItem
 }
 
 // CashFlowItemType кодирует тип выплаты
@@ -147,6 +150,59 @@ type CashFlowItem struct {
 
 	// Сумма выплаты, в рублях
 	ValueRub float64
+}
+
+// SuggestRequest - запрос на формирование предложений по инвестированию
+type SuggestRequest struct {
+	// Сумма для инвестирования
+	Amount float64
+
+	// Максимальный срок инвестирования
+	MaxDuration Duration
+
+	// Ограничения по составу портфеля
+	Parts []*SuggestRequestPart
+}
+
+// SuggestRequestPart - ограничения по составу портфеля для запроса SuggestRequest
+type SuggestRequestPart struct {
+	// Тип коллекции
+	Collection Collection
+
+	// Вес в портфеле
+	Weight float64
+}
+
+// SuggestResult - результат расчета предложений по инвестированию
+type SuggestResult struct {
+	// Список позиций
+	Positions []*SuggestedPortfolioPosition
+
+	// Общая сумма инвестирования
+	Amount float64
+
+	// Дней до погашения всего портфеля
+	DurationDays int
+
+	// Прибыль, в валюте
+	ProfitLoss float64
+
+	// Прибыль, в % по отношению к сумме вложений
+	RelativeProfitLoss float64
+
+	// Приведенная доходность, % годовых
+	InterestRate float64
+}
+
+// SuggestedPortfolioPosition - позиция в предложенном портфеле
+type SuggestedPortfolioPosition struct {
+	Report
+
+	// Размер позиции
+	Quantity int
+
+	// Доля в составе портфеля (0..1)
+	Weight float64
 }
 
 // New создает новый объект Service

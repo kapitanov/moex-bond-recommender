@@ -1,0 +1,26 @@
+{{define "head"}}
+<title>Калькулятор инвестиций - Рекомендации по облигациям</title>
+{{end}}
+
+{{define "content"}}
+<h1>
+	Калькулятор инвестиций
+</h1>
+
+<div id="suggestCalc">
+	<v-suggest-calc-form :collections="collections"></v-suggest-calc-form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+<script src="/js/suggest-calc.js"></script>
+<script>
+	window.addEventListener('load', function () {
+		new Vue({
+			el: '#suggestCalc',
+			data: {
+				collections: JSON.parse({{ json .Collections }})
+			}
+		});
+	});
+</script>
+{{end}}
+

@@ -1,4 +1,4 @@
-package web
+package pages
 
 import (
 	"context"
@@ -12,20 +12,19 @@ import (
 )
 
 // CollectionPage обрабатывает запросы "GET /collections/:id"
-func (ctrl *pagesController) CollectionPage(c *gin.Context) {
+func (ctrl *Controller) CollectionPage(c *gin.Context) {
 	id := c.Param("id")
-	model, err := NewCollectionPageModel(ctrl.app, id)
+	model, err := NewCollectionPageModel(ctrl.app, c, id)
 	if err != nil {
 		if err == recommender.ErrNotFound {
-			c.HTML(http.StatusNotFound, "pages/collection_not_found", id)
+			ctrl.renderHTML(c, http.StatusNotFound, "pages/collection_not_found", id)
 			return
 		}
 
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		panic(err)
 	}
 
-	c.HTML(http.StatusOK, "pages/collection", model)
+	ctrl.renderHTML(c, http.StatusOK, "pages/collection", model)
 }
 
 // CollectionPageModel - модель для страницы "pages/collection.html"
@@ -36,8 +35,8 @@ type CollectionPageModel struct {
 }
 
 // NewCollectionPageModel создает новые объекты типа CollectionPageModel
-func NewCollectionPageModel(app app.App, id string) (*CollectionPageModel, error) {
-	u, err := app.NewUnitOfWork(context.Background())
+func NewCollectionPageModel(app app.App, context context.Context, id string) (*CollectionPageModel, error) {
+	u, err := app.NewUnitOfWork(context)
 	if err != nil {
 		return nil, err
 	}

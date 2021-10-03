@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/kapitanov/moex-bond-recommender/pkg/app"
+	"github.com/kapitanov/moex-bond-recommender/pkg/web/pages"
 )
 
 // DefaultAddress - адрес для прослушивания по умолчанию
@@ -29,10 +30,7 @@ type Service interface {
 
 // New создает новые объекты типа Service
 func New(options ...Option) (Service, error) {
-	gin.SetMode(gin.ReleaseMode)
-
 	s := &service{
-		router:  gin.New(),
 		logger:  log.New(io.Discard, "", 0),
 		address: DefaultAddress,
 		done:    &sync.WaitGroup{},
@@ -45,16 +43,20 @@ func New(options ...Option) (Service, error) {
 		}
 	}
 
+	if !s.debugMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	s.router = gin.New()
 	s.router.HTMLRender = ginview.New(goview.Config{
 		Root:         "templates",
 		Extension:    ".html",
 		Master:       "layout",
 		Partials:     []string{},
-		Funcs:        defineFunctions(s.googleAnalyticsID),
-		DisableCache: false,
+		Funcs:        pages.DefineFunctions(s.googleAnalyticsID),
+		DisableCache: s.debugMode,
 		Delims:       goview.Delims{Left: "{{", Right: "}}"},
 	})
-	s.pagesController = &pagesController{app: s.app}
+	s.pagesController = pages.New(s.app, s.googleAnalyticsID, s.debugMode, s.logger)
 	s.ConfigureEndpoints()
 	return s, nil
 }
@@ -94,15 +96,24 @@ func WithGoogleAnalyticsID(value string) Option {
 	}
 }
 
+// WithDebugMode включает отладочный режим
+func WithDebugMode(value bool) Option {
+	return func(s *service) error {
+		s.debugMode = value
+		return nil
+	}
+}
+
 type service struct {
 	router            *gin.Engine
 	logger            *log.Logger
 	address           string
 	done              *sync.WaitGroup
 	app               app.App
-	pagesController   *pagesController
+	pagesController   *pages.Controller
 	server            *http.Server
 	googleAnalyticsID string
+	debugMode         bool
 }
 
 // Start запускает веб приложение
@@ -120,6 +131,7 @@ func (s *service) Start() error {
 
 		s.done.Done()
 	}()
+	s.done.Add(1)
 
 	return nil
 }
@@ -134,8 +146,4 @@ func (s *service) Close() {
 	if err != nil {
 		s.logger.Fatalf("could not gracefully shutdown the server: %v\n", err)
 	}
-}
-
-type pagesController struct {
-	app app.App
 }

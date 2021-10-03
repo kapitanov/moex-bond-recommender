@@ -40,8 +40,8 @@ func (repo *collectionBondRefRepository) Rebuild(collectionID string, duration i
 
 	sqlQuery := `
 INSERT INTO collection_bonds(collection_id, duration, bond_id, index)
-SELECT ?,
-       ?,
+SELECT ? AS collection_id,
+       ? AS duration,
        bond_id,
        ROW_NUMBER() OVER (ORDER BY interest_rate DESC) AS index
 FROM reports
