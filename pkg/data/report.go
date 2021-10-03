@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -62,6 +63,10 @@ LIMIT 1
 	var report Report
 	err := repo.db.Raw(sqlQuery, id).First(&report).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrNotFound
+		}
+
 		return nil, err
 	}
 
