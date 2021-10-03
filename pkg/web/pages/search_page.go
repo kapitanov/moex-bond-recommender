@@ -1,4 +1,4 @@
-package web
+package pages
 
 import (
 	"context"
@@ -15,12 +15,11 @@ import (
 )
 
 // SearchPage обрабатывает запросы "GET /search"
-func (ctrl *pagesController) SearchPage(c *gin.Context) {
+func (ctrl *Controller) SearchPage(c *gin.Context) {
 	var query SearchQueryModel
 	err := c.BindQuery(&query)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
+		panic(NewError(400, "malformed query"))
 	}
 
 	text := query.Text
@@ -30,10 +29,9 @@ func (ctrl *pagesController) SearchPage(c *gin.Context) {
 		return
 	}
 
-	model, err := NewSearchPageModel(ctrl.app, text, query.Skip)
+	model, err := NewSearchPageModel(ctrl.app, c, text, query.Skip)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		panic(err)
 	}
 
 	if len(model.Bonds) == 1 {
@@ -42,9 +40,9 @@ func (ctrl *pagesController) SearchPage(c *gin.Context) {
 	}
 
 	if query.Partial {
-		c.HTML(http.StatusOK, "pages/search_partial.html", model)
+		ctrl.renderHTML(c, http.StatusOK, "pages/search_partial.html", model)
 	} else {
-		c.HTML(http.StatusOK, "pages/search", model)
+		ctrl.renderHTML(c, http.StatusOK, "pages/search", model)
 	}
 }
 
@@ -65,8 +63,8 @@ type SearchPageModel struct {
 }
 
 // NewSearchPageModel создает объекты типа SearchPageModel
-func NewSearchPageModel(app app.App, query string, skip int) (*SearchPageModel, error) {
-	u, err := app.NewUnitOfWork(context.Background())
+func NewSearchPageModel(app app.App, context context.Context, query string, skip int) (*SearchPageModel, error) {
+	u, err := app.NewUnitOfWork(context)
 	if err != nil {
 		return nil, err
 	}

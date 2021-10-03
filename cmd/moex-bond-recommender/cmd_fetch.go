@@ -23,7 +23,7 @@ func init() {
 	cmd.Flags().BoolVarP(&fetchMarketData, "market", "m", false, "Fetch market data")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		ctx := CreateCancellableContext()
+		ctx := createCancellableContext()
 
 		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
 		if err != nil {

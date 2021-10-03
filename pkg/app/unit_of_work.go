@@ -26,6 +26,9 @@ type UnitOfWork interface {
 	// GetReport возвращает отчет по отдельной облигации
 	GetReport(idOrISIN string) (*recommender.Report, error)
 
+	// Suggest выполняет расчет предложений по инвестированию
+	Suggest(request *recommender.SuggestRequest) (*recommender.SuggestResult, error)
+
 	// Close закрывает unit of work
 	Close()
 }
@@ -93,6 +96,16 @@ func (u *unitOfWork) GetReport(idOrISIN string) (*recommender.Report, error) {
 	}
 
 	return report, nil
+}
+
+// Suggest выполняет расчет предложений по инвестированию
+func (u *unitOfWork) Suggest(request *recommender.SuggestRequest) (*recommender.SuggestResult, error) {
+	result, err := u.recommenderService.Suggest(u.ctx, u.tx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // Close закрывает unit of work

@@ -1,7 +1,8 @@
-package web
+package pages
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"math"
@@ -18,10 +19,12 @@ const (
 	rubSymbol  = "\u20bd"
 )
 
-func defineFunctions(googleAnalyticsID string) template.FuncMap {
+// DefineFunctions создает набор функций для отрисовки представлений
+func DefineFunctions(googleAnalyticsID string) template.FuncMap {
 	fns := make(template.FuncMap)
 	fns["formatDate"] = formatDate
 	fns["formatPercent"] = formatPercent
+	fns["formatPercentNoScale"] = formatPercentNoScale
 	fns["formatMoney"] = formatMoney
 	fns["formatDuration"] = formatDuration
 	fns["formatDaysTillMaturity"] = formatDaysTillMaturity
@@ -32,6 +35,7 @@ func defineFunctions(googleAnalyticsID string) template.FuncMap {
 	fns["formatBondType"] = formatBondType
 	fns["formatPercentWithSign"] = formatPercentWithSign
 	fns["formatMoneyWithSign"] = formatMoneyWithSign
+	fns["json"] = formatJSON
 
 	fns["googleAnalyticsID"] = func() (string, error) {
 		return googleAnalyticsID, nil
@@ -78,6 +82,20 @@ func formatPercent(v interface{}) (template.HTML, error) {
 
 	str = template.HTMLEscapeString(str)
 	return template.HTML(str), nil
+}
+
+func formatPercentNoScale(v interface{}) (template.HTML, error) {
+	switch t := v.(type) {
+	case float64:
+		return formatPercent(t * 100.0)
+	case *float64:
+		if t != nil {
+			return formatPercent((*t) * 100.0)
+		}
+		break
+	}
+
+	return "", nil
 }
 
 func formatMoney(currency string, v interface{}) (template.HTML, error) {
@@ -321,4 +339,13 @@ func formatMoneyWithSign(currency string, v interface{}) (template.HTML, error) 
 
 	str = template.HTMLEscapeString(str)
 	return template.HTML(str), nil
+}
+
+func formatJSON(v interface{}) (interface{}, error) {
+	bytes, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
 }

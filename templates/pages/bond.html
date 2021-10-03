@@ -17,55 +17,43 @@
 	</ol>
 </nav>
 
-<div class="d-none d-sm-block">
-	<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
-	{{ if eq .Bond.IsHighRisk true }}
-	<span class="badge align-top bg-danger" title="Эта облигация относится к сектору повышенного инвестиционного риска">
-			<i class="bi bi-exclamation-square-fill"></i> Риск
-		</span>
-	{{ end }}
-	{{ if eq .Bond.QualifiedOnly true }}
-	<span class="badge align-top bg-secondary" title="Эта облигация доступна только для квалифицированных инвесторов">
-			<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
-		</span>
-	{{ end }}
-	<span class="float-end h-100 d-inline-block d-print-none">
+<div class="d-none d-md-flex justify-content-center">
+	<h1 class="d-inline-block flex-fill">{{ .Bond.FullName }}</h1>
+	<span class="d-flex h-100 d-print-none gap-2">
 		<a class="btn btn-outline-primary" title="Посмотреть облигацию на сайте Московской биржи"
 		   href="https://www.moex.com/ru/issue.aspx?code={{- .Bond.SecurityID }}" target="_blank">
-			<i class="bi bi-link-45deg"></i>
+			<i class="bi bi-link-45deg"></i> <span class="d-none d-xl-inline">На сайт Московской биржи</span>
 		</a>
 		<button class="btn btn-outline-primary" title="Поделиться" onclick="share();">
-			<i class="bi bi-share"></i>
+			<i class="bi bi-share"></i> <span class="d-none d-xl-inline">Поделиться</span>
 		</button>
 	</span>
 </div>
 
-<div class="d-block d-sm-none">
-	<div>
-		<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
-		{{ if eq .Bond.IsHighRisk true }}
-		<span class="badge align-top bg-danger"
-			  title="Эта облигация относится к сектору повышенного инвестиционного риска">
-				<i class="bi bi-exclamation-square-fill"></i> Риск
-			</span>
-		{{ end }}
-		{{ if eq .Bond.QualifiedOnly true }}
-		<span class="badge align-top bg-secondary"
-			  title="Эта облигация доступна только для квалифицированных инвесторов">
-				<i class="bi bi-exclamation-triangle-fill"></i> Для квалифицированных инвесторов
-			</span>
-		{{ end }}
-	</div>
-	<div class="d-print-none">
-		<a class="btn btn-outline-primary d-block mb-2" title="Посмотреть облигацию на сайте Московской биржи"
-		   href="https://www.moex.com/ru/issue.aspx?code={{- .Bond.SecurityID }}" target="_blank">
-			<i class="bi bi-link-45deg"></i> На сайт Московской биржи
-		</a>
-		<a class="btn btn-outline-primary d-block mb-2" title="Поделиться" onclick="share(); return false;" href="#">
-			<i class="bi bi-share"></i> Поделиться
-		</a>
-	</div>
+<div class="d-flex d-md-none">
+	<h1 class="d-inline-block">{{ .Bond.FullName }}</h1>
 </div>
+<div class="d-flex d-md-none flex-row justify-content-center gap-2 px-1 mb-2">
+	<a class="btn btn-outline-primary col-6" title="Посмотреть облигацию на сайте Московской биржи"
+	   href="https://www.moex.com/ru/issue.aspx?code={{- .Bond.SecurityID }}" target="_blank">
+		<i class="bi bi-link-45deg"></i> На сайт Московской биржи
+	</a>
+	<a class="btn btn-outline-primary col-6" title="Поделиться" onclick="share(); return false;" href="#">
+		<i class="bi bi-share"></i> Поделиться
+	</a>
+</div>
+
+{{ if eq .Bond.IsHighRisk true }}
+<div class="alert alert-danger">
+	<i class="bi bi-exclamation-square-fill"></i> Высокий риск
+</div>
+{{ end }}
+
+{{ if eq .Bond.QualifiedOnly true }}
+<div class="alert alert-primary">
+	<i class="bi bi-exclamation-triangle-fill"></i> Только для квалифицированных инвесторов
+</div>
+{{ end }}
 
 <div class="card w-100 mb-2">
 	<div class="card-body">

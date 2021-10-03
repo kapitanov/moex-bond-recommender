@@ -36,28 +36,12 @@ func init() {
 		"Bond duration range (1y/2y/3y/4y/5y)")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		var duration recommender.Duration
-		switch durationStr {
-		case "1y":
-			duration = recommender.Duration1Year
-			break
-		case "2y":
-			duration = recommender.Duration2Year
-			break
-		case "3y":
-			duration = recommender.Duration3Year
-			break
-		case "4y":
-			duration = recommender.Duration4Year
-			break
-		case "5y":
-			duration = recommender.Duration5Year
-			break
-		default:
-			return fmt.Errorf("\"%s\" is not a valid duration range, valid values are: 1y, 2y, 3y, 4y, 5y", durationStr)
+		duration, err := parseDuration(durationStr)
+		if err != nil {
+			return err
 		}
 
-		ctx := CreateCancellableContext()
+		ctx := createCancellableContext()
 
 		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
 		if err != nil {

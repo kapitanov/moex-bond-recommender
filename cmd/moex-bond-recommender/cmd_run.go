@@ -25,9 +25,10 @@ func init() {
 	attachMoexUrlFlag(cmd, &moexURL)
 	attachListenAddressFlag(cmd, &address)
 	attachGoogleAnalyticsFlag(cmd, &googleAnalyticsID)
+	debugMode := cmd.Flags().Bool("debug", false, "enable debug mode")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		ctx := CreateCancellableContext()
+		ctx := createCancellableContext()
 
 		app, err := app.New(app.WithMoexURL(moexURL), app.WithDataSource(postgresConnString))
 		if err != nil {
@@ -44,7 +45,8 @@ func init() {
 		webapp, err := web.New(
 			web.WithListenAddress(address),
 			web.WithLogger(webappLogger), web.WithApp(app),
-			web.WithGoogleAnalyticsID(googleAnalyticsID))
+			web.WithGoogleAnalyticsID(googleAnalyticsID),
+			web.WithDebugMode(*debugMode))
 		if err != nil {
 			return err
 		}
