@@ -18,14 +18,17 @@ jobs:
       with:
         go-version: 1.17
 
-    - name: Format
+    - name: download
+      run: go mod download
+
+    - name: format
       run: if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then exit 1; fi
 
-    - name: Vet
+    - name: vet
       run: go vet ./...
 
-    - name: Build
+    - name: build
       run: go build -v ./...
 
-    - name: Test
+    - name: test
       run: go test -v ./...
