@@ -12,7 +12,7 @@ type Issuer struct {
 	ID        int       `gorm:"column:id; primaryKey"`
 	MoexID    int       `gorm:"column:moex_id; unique"`
 	Name      string    `gorm:"column:name"`
-	INN       *string   `gorm:"column:inn"`
+	INN       *string   `gorm:"column:inn; unique"`
 	OKPO      *string   `gorm:"column:okpo"`
 	CreatedAt time.Time `gorm:"column:created"`
 	UpdatedAt time.Time `gorm:"column:updated"`
@@ -33,6 +33,10 @@ type IssuerRepository interface {
 	// GetByMoexID выполняет поиски эмитента по полю Issuer.MoexID
 	// Если эмитент не найден, возвращается ошибка ErrNotFound
 	GetByMoexID(moexID int) (*Issuer, error)
+
+	// GetByINN выполняет поиски эмитента по полю Issuer.INN
+	// Если эмитент не найден, возвращается ошибка ErrNotFound
+	GetByINN(inn string) (*Issuer, error)
 
 	// Create создает эмитента
 	// Если эмитент уже существует, то возвращается ErrAlreadyExists
@@ -85,6 +89,23 @@ func (repo *issuerRepository) GetByID(id int) (*Issuer, error) {
 func (repo *issuerRepository) GetByMoexID(moexID int) (*Issuer, error) {
 	var issuer Issuer
 	err := repo.db.First(&issuer, "moex_id = ?", moexID).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	return &issuer, nil
+}
+
+// GetByINN выполняет поиски эмитента по полю Issuer.INN
+// Если эмитент не найден, возвращается ошибка ErrNotFound
+func (repo *issuerRepository) GetByINN(inn string) (*Issuer, error) {
+	var issuer Issuer
+	err := repo.db.First(&issuer, "inn = ?", inn).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

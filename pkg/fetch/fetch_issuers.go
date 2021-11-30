@@ -15,6 +15,16 @@ func (w *bondFetchWorker) CreateOrUpdateIssuer(security *moex.Security) (*data.I
 		return nil, err
 	}
 
+	if security.IssuerINN != nil {
+		issuer, err = w.tx.Issuers.GetByINN(*security.IssuerINN)
+		if err == nil {
+			return issuer, nil
+		}
+		if err != data.ErrNotFound {
+			return nil, err
+		}
+	}
+
 	args := data.CreateIssuerArgs{
 		MoexID: security.IssuerId,
 		Name:   security.IssuerName,
