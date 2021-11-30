@@ -125,10 +125,8 @@ func (q SecurityListQuery) getValues(values url.Values) {
 		switch *q.TradingStatus {
 		case IsTraded:
 			values.Set("is_trading", "true")
-			break
 		case IsNotTraded:
 			values.Set("is_trading", "false")
-			break
 		}
 	}
 }
@@ -169,9 +167,7 @@ func (it *securityListIterator) Next() ([]*Security, error) {
 	items := make([]*Security, 0)
 	for _, respItem := range resp {
 		if respItem.Securities != nil {
-			for _, item := range respItem.Securities {
-				items = append(items, item)
-			}
+			items = append(items, respItem.Securities...)
 		}
 	}
 

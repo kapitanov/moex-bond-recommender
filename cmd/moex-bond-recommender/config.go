@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/spf13/cobra"
 
@@ -19,9 +20,9 @@ func createCancellableContext() context.Context {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt, os.Kill)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		_ = <-signals
+		<-signals
 		cancel()
 	}()
 

@@ -61,10 +61,8 @@ func (q CouponListQuery) getValues(values url.Values) {
 	switch q.TradingStatus {
 	case IsTraded:
 		values.Set("is_traded", "true")
-		break
 	case IsNotTraded:
 		values.Set("is_traded", "false")
-		break
 	}
 }
 
@@ -104,9 +102,7 @@ func (it *couponListIterator) Next() ([]*Coupon, error) {
 	items := make([]*Coupon, 0)
 	for _, respItem := range resp {
 		if respItem.Coupons != nil {
-			for _, item := range respItem.Coupons {
-				items = append(items, item)
-			}
+			items = append(items, respItem.Coupons...)
 		}
 	}
 

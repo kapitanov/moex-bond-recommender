@@ -125,13 +125,10 @@ func init() {
 				switch c.Type {
 				case recommender.Coupon:
 					row.HasCoupon = true
-					break
 				case recommender.Amortization:
 					row.HasAmortization = true
-					break
 				case recommender.Maturity:
 					row.HasMaturity = true
-					break
 				}
 			}
 		}

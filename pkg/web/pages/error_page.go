@@ -38,24 +38,22 @@ func (ctrl *Controller) ErrorPageMiddleware() gin.HandlerFunc {
 				return
 			}
 
-			var model ErrorPageModel
+			var model *ErrorPageModel
 			switch e := err.(type) {
 			case Error:
-				model = ErrorPageModel{
+				model = &ErrorPageModel{
 					StatusCode: e.StatusCode,
 					Message:    e.Message,
 				}
-				break
 			default:
 				ctrl.logger.Printf("error while handling \"%s %s\": %s", c.Request.Method, c.Request.RequestURI, err)
-				model = ErrorPageModel{
+				model = &ErrorPageModel{
 					StatusCode: 500,
 					Message:    "Internal Server Error",
 				}
-				break
 			}
 
-			ctrl.renderHTML(c, model.StatusCode, "pages/error", &model)
+			ctrl.renderHTML(c, model.StatusCode, "pages/error", model)
 		}()
 
 		c.Next()

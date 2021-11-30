@@ -136,10 +136,9 @@ func (c *dbContextConfig) Connect() (*gorm.DB, error) {
 	r, err := conn.Query("SELECT 1")
 	if err != nil {
 		err = errors.Unwrap(err)
-		switch err.(type) {
+		switch e := err.(type) {
 		case *pgconn.PgError:
-			pgError := err.(*pgconn.PgError)
-			if pgError.Code == "3D000" { // database <name> doesn't exists
+			if e.Code == "3D000" { // database <name> doesn't exists
 				err = c.CreateDB(*cfg)
 				if err != nil {
 					return nil, err
@@ -152,7 +151,6 @@ func (c *dbContextConfig) Connect() (*gorm.DB, error) {
 			} else {
 				return nil, err
 			}
-			break
 
 		default:
 			return nil, err

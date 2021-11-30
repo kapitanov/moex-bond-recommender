@@ -120,25 +120,18 @@ func (w *offerFetchWorker) MapOfferType(t *moex.OfferType) *data.OfferType {
 	switch *t {
 	case moex.GenericOffer:
 		result = data.GenericOffer
-		break
 	case moex.CompletedGenericOffer:
 		result = data.CompletedGenericOffer
-		break
 	case moex.CanceledGenericOffer:
 		result = data.CanceledGenericOffer
-		break
 	case moex.DefaultGenericOffer:
 		result = data.DefaultGenericOffer
-		break
 	case moex.TechDefaultGenericOffer:
 		result = data.TechDefaultGenericOffer
-		break
 	case moex.MaturityOffer:
 		result = data.MaturityOffer
-		break
 	case moex.CanceledMaturityOffer:
 		result = data.CanceledMaturityOffer
-		break
 	}
 
 	return &result

@@ -159,7 +159,7 @@ func TestProvider_GetSecurityDescription(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("content-type", "application/json")
-		w.Write([]byte(json))
+		_, _ = w.Write([]byte(json))
 	}))
 	defer func() { testServer.Close() }()
 

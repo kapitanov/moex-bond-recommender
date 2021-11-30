@@ -42,7 +42,7 @@ func (app *appImpl) IsStaticDataUpToDate(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 
-	isUpToDate := time.Now().Sub(*lastTime).Hours() < 24.0
+	isUpToDate := time.Since(*lastTime).Hours() < 24.0
 	return isUpToDate, nil
 }
 

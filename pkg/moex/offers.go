@@ -87,10 +87,8 @@ func (q OfferListQuery) getValues(values url.Values) {
 	switch q.TradingStatus {
 	case IsTraded:
 		values.Set("is_traded", "true")
-		break
 	case IsNotTraded:
 		values.Set("is_traded", "false")
-		break
 	}
 }
 
@@ -130,9 +128,7 @@ func (it *offersListIterator) Next() ([]*Offer, error) {
 	items := make([]*Offer, 0)
 	for _, respItem := range resp {
 		if respItem.Offers != nil {
-			for _, item := range respItem.Offers {
-				items = append(items, item)
-			}
+			items = append(items, respItem.Offers...)
 		}
 	}
 

@@ -19,7 +19,7 @@ func (s *service) ConfigureEndpoints() {
 	routes.GET("/suggest", s.pagesController.SuggestPage)
 
 	s.router.NoRoute(s.serveStaticFiles)
-	mime.AddExtensionType(".js", "application/javascript")
+	_ = mime.AddExtensionType(".js", "application/javascript")
 }
 
 // serveStaticFiles отвечает за раздачу статики

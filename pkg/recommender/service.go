@@ -140,9 +140,7 @@ func (s *service) generatePositionsForSuggestion(tx *data.TX, request *SuggestRe
 				return nil, err
 			}
 
-			for _, p := range ps {
-				positions = append(positions, p)
-			}
+			positions = append(positions, ps...)
 			unusedAmount = remainingAmount
 		}
 

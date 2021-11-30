@@ -65,13 +65,10 @@ func (ctrl *Controller) SuggestPage(c *gin.Context) {
 			switch c.Type {
 			case recommender.Coupon:
 				item.HasCoupon = true
-				break
 			case recommender.Amortization:
 				item.HasAmortization = true
-				break
 			case recommender.Maturity:
 				item.HasMaturity = true
-				break
 			}
 		}
 	}
@@ -124,19 +121,14 @@ func NewSuggestPortfolioRequest(c *gin.Context, u app.UnitOfWork) (*SuggestPortf
 	switch request.MaxDurationRaw {
 	case 1:
 		request.MaxDuration = recommender.Duration1Year
-		break
 	case 2:
 		request.MaxDuration = recommender.Duration2Year
-		break
 	case 3:
 		request.MaxDuration = recommender.Duration3Year
-		break
 	case 4:
 		request.MaxDuration = recommender.Duration4Year
-		break
 	case 5:
 		request.MaxDuration = recommender.Duration5Year
-		break
 	default:
 		return nil, NewError(400, "invalid value for \"max_duration\" parameter")
 	}

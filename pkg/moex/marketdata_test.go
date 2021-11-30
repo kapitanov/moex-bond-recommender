@@ -145,12 +145,10 @@ func TestProvider_GetMarketData(t *testing.T) {
 		case "/iss/engines/stock/markets/bonds/securities.json":
 			w.WriteHeader(200)
 			w.Header().Set("content-type", "application/json")
-			w.Write([]byte(json))
-			break
+			_, _ = w.Write([]byte(json))
 
 		default:
 			w.WriteHeader(404)
-			break
 		}
 	}))
 	defer func() { testServer.Close() }()

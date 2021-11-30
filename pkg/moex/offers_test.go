@@ -109,12 +109,10 @@ func TestProvider_ListOffers(t *testing.T) {
 
 			w.WriteHeader(200)
 			w.Header().Set("content-type", "application/json")
-			w.Write(body)
-			break
+			_, _ = w.Write(body)
 
 		default:
 			w.WriteHeader(404)
-			break
 		}
 	}))
 	defer func() { testServer.Close() }()

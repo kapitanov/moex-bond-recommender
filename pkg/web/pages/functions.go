@@ -49,17 +49,14 @@ func formatDate(v interface{}) (template.HTML, error) {
 	switch t := v.(type) {
 	case time.Time:
 		str = monday.Format(t, "2 Jan 2006", monday.LocaleRuRU)
-		break
 	case *time.Time:
 		if t != nil {
 			str = monday.Format(*t, "2 Jan 2006", monday.LocaleRuRU)
 		}
-		break
 	case sql.NullTime:
 		if t.Valid {
 			str = monday.Format(t.Time, "2 Jan 2006", monday.LocaleRuRU)
 		}
-		break
 	}
 
 	str = template.HTMLEscapeString(str)
@@ -72,12 +69,10 @@ func formatPercent(v interface{}) (template.HTML, error) {
 	switch t := v.(type) {
 	case float64:
 		str = fmt.Sprintf("%0.2f%%", t)
-		break
 	case *float64:
 		if t != nil {
 			str = fmt.Sprintf("%0.2f%%", *t)
 		}
-		break
 	}
 
 	str = template.HTMLEscapeString(str)
@@ -92,7 +87,6 @@ func formatPercentNoScale(v interface{}) (template.HTML, error) {
 		if t != nil {
 			return formatPercent((*t) * 100.0)
 		}
-		break
 	}
 
 	return "", nil
@@ -103,28 +97,22 @@ func formatMoney(currency string, v interface{}) (template.HTML, error) {
 	switch t := v.(type) {
 	case float64:
 		str = fmt.Sprintf("%0.2f", t)
-		break
 	case *float64:
 		if t != nil {
 			str = fmt.Sprintf("%0.2f", *t)
 		}
-		break
 	}
 
 	if str != "" {
 		switch currency {
 		case "USD":
 			str = fmt.Sprintf("$%s", str)
-			break
 		case "EUR":
 			str = fmt.Sprintf("%s %s", str, euroSymbol)
-			break
 		case "RUB":
 			str = fmt.Sprintf("%s %s", str, rubSymbol)
-			break
 		default:
 			str = fmt.Sprintf("%s %s", str, currency)
-			break
 		}
 	}
 
@@ -139,24 +127,17 @@ func formatDuration(v interface{}) (template.HTML, error) {
 		switch t {
 		case recommender.Duration1Year:
 			str = "1 год"
-			break
 		case recommender.Duration2Year:
 			str = "2 года"
-			break
 		case recommender.Duration3Year:
 			str = "3 года"
-			break
 		case recommender.Duration4Year:
 			str = "4 года"
-			break
 		case recommender.Duration5Year:
 			str = "5 лет"
-			break
 		default:
 			str = string(t)
-			break
 		}
-		break
 	}
 
 	str = template.HTMLEscapeString(str)
@@ -168,19 +149,16 @@ func formatDaysTillMaturity(v interface{}) (template.HTML, error) {
 	switch t := v.(type) {
 	case time.Time:
 		d = t
-		break
 	case *time.Time:
 		if t == nil {
 			return "", nil
 		}
 		d = *t
-		break
 	case sql.NullTime:
 		if !t.Valid {
 			return "", nil
 		}
 		d = t.Time
-		break
 	default:
 		return "", nil
 	}
@@ -200,15 +178,11 @@ func formatCashFlowItemType(v interface{}) (template.HTML, error) {
 		switch t {
 		case recommender.Coupon:
 			str = "Купон"
-			break
 		case recommender.Amortization:
 			str = "Амортизация"
-			break
 		case recommender.Maturity:
 			str = "Погашение"
-			break
 		}
-		break
 	}
 
 	str = template.HTMLEscapeString(str)
@@ -283,7 +257,6 @@ func formatPercentWithSign(v interface{}) (template.HTML, error) {
 			sign = "-"
 		}
 		str = fmt.Sprintf("%s %0.2f%%", sign, math.Abs(t))
-		break
 	case *float64:
 		if t != nil {
 			sign := "+"
@@ -292,7 +265,6 @@ func formatPercentWithSign(v interface{}) (template.HTML, error) {
 			}
 			str = fmt.Sprintf("%s %0.2f%%", sign, math.Abs(*t))
 		}
-		break
 	}
 
 	str = template.HTMLEscapeString(str)
@@ -308,7 +280,6 @@ func formatMoneyWithSign(currency string, v interface{}) (template.HTML, error) 
 			sign = "-"
 		}
 		str = fmt.Sprintf("%s %0.2f", sign, math.Abs(t))
-		break
 	case *float64:
 		if t != nil {
 			sign := "+"
@@ -317,23 +288,18 @@ func formatMoneyWithSign(currency string, v interface{}) (template.HTML, error) 
 			}
 			str = fmt.Sprintf("%s %0.2f", sign, math.Abs(*t))
 		}
-		break
 	}
 
 	if str != "" {
 		switch currency {
 		case "USD":
 			str = fmt.Sprintf("$%s", str)
-			break
 		case "EUR":
 			str = fmt.Sprintf("%s %s", str, euroSymbol)
-			break
 		case "RUB":
 			str = fmt.Sprintf("%s %s", str, rubSymbol)
-			break
 		default:
 			str = fmt.Sprintf("%s %s", str, currency)
-			break
 		}
 	}
 

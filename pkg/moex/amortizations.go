@@ -71,10 +71,8 @@ func (q AmortizationListQuery) getValues(values url.Values) {
 	switch q.TradingStatus {
 	case IsTraded:
 		values.Set("is_traded", "true")
-		break
 	case IsNotTraded:
 		values.Set("is_traded", "false")
-		break
 	}
 }
 
@@ -114,9 +112,7 @@ func (it *amortizationListIterator) Next() ([]*Amortization, error) {
 	items := make([]*Amortization, 0)
 	for _, respItem := range resp {
 		if respItem.Amortizations != nil {
-			for _, item := range respItem.Amortizations {
-				items = append(items, item)
-			}
+			items = append(items, respItem.Amortizations...)
 		}
 	}
 
